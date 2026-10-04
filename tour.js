@@ -14,7 +14,7 @@
   let utterance=null;
   function stopReading(){
     if(utterance){utterance.onend=null;utterance.onerror=null;speech.cancel();utterance=null;}
-    $('tour-read').textContent='▶ Read aloud';$('tour-read').setAttribute('aria-pressed','false');
+    $('tour-read').textContent='▶';$('tour-read').setAttribute('aria-label','Read aloud');$('tour-read').title='Read aloud';$('tour-read').setAttribute('aria-pressed','false');
   }
   if(!speech||!window.SpeechSynthesisUtterance){
     $('tour-read').hidden=true;$('tour-voice-note').hidden=false;
@@ -25,12 +25,13 @@
     const text=steps[index][1]+'. '+steps[index][2]+(index===1?' Practice only: two plus three equals what?':'');
     const reading=new window.SpeechSynthesisUtterance(text);
     const voices=speech.getVoices().filter(voice=>/^en(?:-|_)/i.test(voice.lang));
-    reading.voice=voices.find(voice=>/Samantha|Google US English|Microsoft Aria/i.test(voice.name))||voices.find(voice=>voice.default)||voices[0]||null;
-    reading.lang=reading.voice?.lang||'en-US';reading.pitch=1.25;reading.rate=.95;
+    const preferred=['Aria','Jenny','Google US English','Samantha','Karen','Moira','Tessa','Ava','Zira'];
+    reading.voice=preferred.map(name=>voices.find(voice=>voice.name.includes(name))).find(Boolean)||voices.find(voice=>/natural|enhanced|premium/i.test(voice.name))||voices.find(voice=>voice.default)||voices[0]||null;
+    reading.lang=reading.voice?.lang||'en-US';reading.pitch=1;reading.rate=1;
     reading.onend=()=>{if(utterance===reading)stopReading();};
     reading.onerror=()=>{if(utterance===reading){stopReading();$('tour-voice-note').hidden=false;$('tour-voice-note').textContent='Couldn’t play the voice. Try Read aloud again.';}};
     $('tour-voice-note').hidden=true;utterance=reading;
-    $('tour-read').textContent='■ Stop reading';$('tour-read').setAttribute('aria-pressed','true');
+    $('tour-read').textContent='■';$('tour-read').setAttribute('aria-label','Stop reading');$('tour-read').title='Stop reading';$('tour-read').setAttribute('aria-pressed','true');
     speech.speak(reading);
   });
   window.addEventListener('pagehide',stopReading);

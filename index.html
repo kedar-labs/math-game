@@ -7,11 +7,11 @@
   <meta name="description" content="A little math. A little mystery. Solve ten problems to reveal a surprise picture.">
   <title>Math Game</title>
   <link rel="stylesheet" href="assets/fonts/fonts.css">
-  <link rel="stylesheet" href="styles.css?v=squishy-voice-8">
-  <script src="tour.js?v=squishy-voice-8" defer></script>
+  <link rel="stylesheet" href="styles.css?v=natural-voice-9">
+  <script src="tour.js?v=natural-voice-9" defer></script>
   <script src="tutor-config.js" defer></script>
-  <script src="math-help.js?v=squishy-voice-8" defer></script>
-  <script src="game.js?v=squishy-voice-8" defer></script>
+  <script src="math-help.js?v=natural-voice-9" defer></script>
+  <script src="game.js?v=natural-voice-9" defer></script>
 </head>
 <body>
 <main class="wrap">
@@ -111,8 +111,7 @@
   <div class="tour-balloon">
     <button id="tour-close" class="tour-close" aria-label="Close how to play" type="button">×</button>
     <span id="tour-count" class="eyebrow"></span>
-    <h2 id="tour-title"></h2><p id="tour-text"></p>
-    <button id="tour-read" class="secondary tour-read" type="button" aria-pressed="false">▶ Read aloud</button>
+    <div class="tour-title-row"><h2 id="tour-title"></h2><button id="tour-read" class="secondary tour-read" type="button" aria-label="Read aloud" title="Read aloud" aria-pressed="false">▶</button></div><p id="tour-text"></p>
     <p id="tour-voice-note" class="help-note" role="status" hidden></p>
     <div id="tour-sample" hidden><label for="tour-answer">Practice only: 2 + 3 = ?</label><div class="tour-practice"><input id="tour-answer" inputmode="numeric" aria-label="Sample answer"><button id="tour-check" type="button" class="primary">Try it</button></div><p id="tour-result" role="status"></p><div id="tour-piece" hidden>✦ One tile revealed! ✦</div></div>
     <nav aria-label="Demo steps"><button id="tour-back" class="secondary" type="button">Back</button><button id="tour-next" class="primary" type="button">Next →</button></nav>
