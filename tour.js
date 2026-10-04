@@ -6,7 +6,7 @@
     ['.settings','Make it your game','Choose a topic. Pick No timer when you want time to think, or try a 10- or 20-second challenge.'],
     ['.right-panel','Try a little math','Type your answer, then press Enter. Fractions like 1/4 work too. Try this sample below—it won’t affect your game.'],
     ['.left-panel','Reveal your surprise','Each correct answer uncovers one tile. Get ten correct answers to reveal your squishy! A wrong answer goes into your answer trail so you can learn from it.'],
-    ['.math-help','Ask me for help','Explain this problem asks about the current question. Or type your own math question and press Send question—even before starting a game. A parent enters your family code to unlock AI help.'],
+    ['.math-help','Ask me for help','Explain this problem asks about the current question. Or type your own math question and press Send question—even before starting a game. You need your family access code to use AI Math Help. Ask a parent for the code and enter it at the bottom of the Math Help panel.'],
     ['.history-section','Every try helps you learn','Your answer trail shows what you tried and the correct answers. Reset gives you a fresh start. Start game after a win also clears the old round. Ready? Close this guide and choose your topic!']
   ];
   let index=0,target=null,previousFocus=null;
