@@ -120,11 +120,11 @@
       $('model-title').textContent=fractions?'The whole square represents 1':'Each small square is 1 square unit';
       $('model-columns').textContent=fractions?`${p.shadeCols}/${p.cols} across → (${p.shadeCols} of ${p.cols} columns)`:`${p.cols} columns →`;
       $('model-rows').textContent=fractions?`${p.shadeRows}/${p.rows} down ↓`:`${p.rows} rows ↓`;
-      $('model-key').textContent=fractions?'Blue = columns · Pink = rows · Purple = both':'';
-      $('model-task').textContent=fractions?'Count the purple squares. What fraction of ALL the small squares is purple?':'Count the squares, or multiply rows × columns.';
+      $('model-key').textContent=fractions?'Light purple = selected rows or columns · Dark purple = overlap':'';
+      $('model-task').textContent=fractions?'Count the dark purple squares. What fraction of ALL the small squares is dark purple?':'Count the squares, or multiply rows × columns.';
       model.style.aspectRatio=fractions?'1':`${p.cols} / ${p.rows}`;
       model.hidden=false;model.style.gridTemplateColumns=`repeat(${p.cols}, 1fr)`;
-      model.setAttribute('role','img');model.setAttribute('aria-label',topic==='area'?`${p.rows} rows and ${p.cols} columns of unit squares`:`A unit square divided into ${p.rows} rows and ${p.cols} columns; ${p.shadeRows} rows shaded pink, ${p.shadeCols} columns blue. Purple shows their overlap.`);
+      model.setAttribute('role','img');model.setAttribute('aria-label',topic==='area'?`${p.rows} rows and ${p.cols} columns of unit squares`:`A unit square divided into ${p.rows} rows and ${p.cols} columns; ${p.shadeRows} rows and ${p.shadeCols} columns shaded light purple. Dark purple shows their overlap.`);
       for(let r=0;r<p.rows;r++)for(let c=0;c<p.cols;c++){
         const cell=document.createElement('span');cell.className=topic==='area'?'model-cell overlap':`model-cell ${r<p.shadeRows?(c<p.shadeCols?'overlap':'row-shade'):(c<p.shadeCols?'col-shade':'')}`;model.appendChild(cell);
       }
