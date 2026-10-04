@@ -85,17 +85,13 @@
   }
   root.MathHelp = {
     setProblem(value) {
-      cancelPending();
       problem = {...value};
       context.textContent = `Current problem: ${problem.expression || `${problem.a} ${problem.sym} ${problem.b}`} = ?`;
-      reply.textContent = 'Ask me to explain this problem, or type another arithmetic question.';
+
     },
     reset() {
-      cancelPending();
       problem = null;
-      input.value = '';
-      context.textContent = 'Start a game to ask about your problem.';
-      reply.textContent = 'Try “Explain this problem” or “What is 8 × 7?”';
+      context.textContent = 'Ask a math question anytime—no game needed.';
     }
   };
   document.getElementById('help-form').addEventListener('submit', event => {
