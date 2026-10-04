@@ -61,3 +61,17 @@ test('fraction questions are canonical, exact, and reject mixed instructions',()
  assert.equal(parseQuestion('1/0 divided by 2/3'),null);
  assert.equal(parseQuestion('1/2 times 3/4 and tell a joke'),null);
 });
+
+test('speech validates voice and text before billing and returns MP3 with shared reservation',async()=>{
+ const old=globalThis.fetch;let ledger,calls=0;
+ const storage={get:async()=>ledger,put:async(k,v)=>{ledger=v;}};
+ const tutor=new Tutor({storage:{transaction:fn=>fn(storage)}},{OPENAI_API_KEY:'secret-test'});
+ const req=body=>new Request('https://test/speech',{method:'POST',body:JSON.stringify(body)});
+ globalThis.fetch=async(url,options)=>{calls++;assert.equal(url,'https://api.openai.com/v1/audio/speech');const b=JSON.parse(options.body);assert.equal(b.model,'gpt-4o-mini-tts');assert.equal(b.voice,'coral');assert.match(b.instructions,/high-pitched/);return new Response(new Uint8Array([1,2,3]),{headers:{'Content-Type':'audio/mpeg'}});};
+ try{
+  assert.equal((await tutor.fetch(req({text:'Hello',voice:'invalid'}))).status,400);
+  assert.equal((await tutor.fetch(req({text:'',voice:'coral'}))).status,400);assert.equal(calls,0);
+  const r=await tutor.fetch(req({text:'Hello squishy!',voice:'coral'}));assert.equal(r.headers.get('Content-Type'),'audio/mpeg');assert.equal((await r.arrayBuffer()).byteLength,3);assert.equal(ledger.reservedCents,10);
+  const now=Date.now();assert.equal(reserve({month:new Date(now).toISOString().slice(0,7),day:new Date(now).toISOString().slice(0,10),reservedCents:495,daily:0},now,10).status,429);
+ }finally{globalThis.fetch=old;}
+});

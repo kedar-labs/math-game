@@ -37,15 +37,15 @@ export function parseQuestion(text, context) {
   const sym={'plus':'+','-':'−','minus':'−','*':'×','x':'×','times':'×','multiplied by':'×','/':'÷','divided by':'÷'}[m[2]]||m[2];
   const p=problem({a:Number(m[1]),b:Number(m[3]),sym});return p?{kind:'problem',mode:'explain',problem:p}:null;
 }
-export function reserve(ledger, now=Date.now()) {
+export function reserve(ledger, now=Date.now(), cents=1) {
   const month=new Date(now).toISOString().slice(0,7);
   const day=new Date(now).toISOString().slice(0,10);
   const state=ledger||{};
   if(state.month!==month){state.month=month;state.reservedCents=0;}
   if(state.day!==day){state.day=day;state.daily=0;}
-  if(state.reservedCents>=500)return {error:'The monthly Math Help allowance is used up. Try again next month.',status:429};
+  if(state.reservedCents+cents>500)return {error:'The monthly Math Help allowance is used up. Try again next month.',status:429};
   if(state.daily>=50)return {error:'Math Help has reached today’s limit. Try again tomorrow.',status:429};
   if(state.last && now-state.last<5000)return {error:'Please wait a few seconds before another question.',status:429};
-  state.reservedCents++;state.daily++;state.last=now;
+  state.reservedCents+=cents;state.daily++;state.last=now;
   return {state};
 }

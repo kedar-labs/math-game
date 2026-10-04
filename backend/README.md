@@ -31,3 +31,6 @@ The model generates short explanations. Output has length and link/HTML checks a
 ## Verification so far
 
 `node --test tests/*.test.*` from the project root passes 15 tests, including mocked API tests. No real key or live request has been used. Cloudflare deployment validation was blocked because access to its local configuration directory was not granted. Complete deployment validation and a real API smoke test before enabling the endpoint in the frontend.
+
+## Speech studio
+`voice.html` calls authenticated `POST /speech` using the same family code and private API key. It uses gpt-4o-mini-tts, MP3 output, selectable coral/shimmer/nova/marin voices and fixed high-register cartoon instructions. Text is limited to 1,000 characters. Each generation reserves 10 cents in the shared $5 monthly ledger (conservative allowance, not actual billing); playback/download makes no new call. Math Help remains math-only.

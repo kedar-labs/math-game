@@ -11,7 +11,7 @@ export default {
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers});
     let result;
     try{
-      if(new URL(request.url).pathname!=='/help')result=json({error:'Not found.'},404);
+      if(new URL(request.url).pathname!=='/help' && new URL(request.url).pathname!=='/speech')result=json({error:'Not found.'},404);
       else if(request.method!=='POST')result=json({error:'Use POST.'},405);
       else if(!env.OPENAI_API_KEY||!env.TUTOR_ACCESS_CODE||env.TUTOR_ACCESS_CODE.length<6)result=json({error:'AI tutor setup is not complete.'},503);
       else if(request.headers.get('X-Tutor-Code')!==env.TUTOR_ACCESS_CODE)result=json({error:'Enter the family access code to use AI Math Help.'},401);
@@ -29,16 +29,29 @@ export class Tutor {
     while(true){const{done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>2048){await reader.cancel();return json({error:'Question is too long.'},413);}chunks.push(value);}
     const bytes=new Uint8Array(size);let offset=0;for(const c of chunks){bytes.set(c,offset);offset+=c.length;}
     let body;try{body=JSON.parse(new TextDecoder().decode(bytes));}catch{return json({error:'Invalid question.'},400);}
-    const task=parseQuestion(body.question,body.problem);
+    const isSpeech=new URL(request.url).pathname==='/speech';
+    const voices=['coral','shimmer','nova','marin'];
+    if(isSpeech && (typeof body.text!=='string'||!body.text.trim()||body.text.length>1000||!voices.includes(body.voice)))return json({error:'Enter up to 1,000 characters and choose a voice.'},400);
+    const task=isSpeech?{}:parseQuestion(body.question,body.problem);
     if(!task)return json({answer:REFUSAL,source:'math-only filter'});
     // Atomic durable reservation happens BEFORE the external API call. Never refund
     // ambiguous failures: an upstream timeout may still incur a charge.
     const budget=await this.ctx.storage.transaction(async tx=>{
-      const next=reserve(await tx.get('ledger'));
+      const next=reserve(await tx.get('ledger'),Date.now(),isSpeech?10:1);
       if(next.state)await tx.put('ledger',next.state);
       return next;
     });
     if(budget.error)return json({error:budget.error},budget.status);
+    if(isSpeech){
+      try{
+        const audio=await fetch('https://api.openai.com/v1/audio/speech',{
+          method:'POST',headers:{Authorization:`Bearer ${this.env.OPENAI_API_KEY}`,'Content-Type':'application/json'},
+          body:JSON.stringify({model:'gpt-4o-mini-tts',voice:body.voice,input:body.text.trim(),response_format:'mp3',instructions:'Speak as a tiny cheerful pink squishy cartoon mascot. Use a naturally high-pitched, bright, light, bouncy voice with warm playful expression. Clear American English, medium pace. Avoid robotic delivery; keep every word easy to understand.'}),signal:AbortSignal.timeout(60000)
+        });
+        if(!audio.ok)return json({error:'Voice generation is unavailable. Check API billing or try later.'},503);
+        return new Response(audio.body,{headers:{'Content-Type':'audio/mpeg','Cache-Control':'no-store'}});
+      }catch{return json({error:'Voice generation timed out. Try later.'},503);}
+    }
     let response;
     try{
       response=await fetch('https://api.openai.com/v1/responses',{
