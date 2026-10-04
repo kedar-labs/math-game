@@ -61,4 +61,4 @@ footer{text-align:center;margin:28px 0 8px;font-size:11px;letter-spacing:.7px;co
 
 #help-reply{border:2px solid var(--purple);color:var(--purple);border-radius:14px;padding:16px;margin-top:16px;background:#fcf9ff;min-height:0}
 
-#easy-bars .fraction-bar{height:58px;border:0;padding:0;gap:5px;background:transparent}.fraction-section{display:grid;gap:2px;border:2px solid #7252ad;padding:3px;border-radius:5px;background:white;min-width:0}
+#easy-bars .fraction-bar{height:72px;border:3px solid #503477;padding:6px;gap:5px;background:#fff;border-radius:9px;margin:16px 0}.fraction-section{height:100%}.fraction-section{display:grid;gap:2px;border:2px solid #7252ad;padding:3px;border-radius:5px;background:white;min-width:0}
