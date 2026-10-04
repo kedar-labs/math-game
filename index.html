@@ -68,10 +68,10 @@
       <p class="help-intro">Big question? Start with a small step.</p>
       <p id="help-context">Start a game to ask about your problem.</p>
       <div id="help-reply" role="status" aria-live="polite">Try “Explain this problem” or “What is 8 × 7?”</div>
-      <div id="tutor-unlock" hidden><label for="tutor-code">Family access code</label><input id="tutor-code" type="password" autocomplete="off" placeholder="Ask a parent for the code"><p class="help-note">Use your family code here, never an API key.</p></div>
       <form id="help-form"><label for="help-input">Your math question</label><textarea id="help-input" rows="3" maxlength="300" placeholder="How do I solve this?" required></textarea><button class="help-send" type="submit">Send question <span aria-hidden="true">↗</span></button></form>
       <button id="help-explain" class="help-explain" type="button">Explain this problem</button>
       <p class="help-note" id="help-mode">Built-in arithmetic preview, not AI yet.<br>Timed games keep counting while you ask for help.</p>
+      <div id="tutor-unlock" hidden><label for="tutor-code">Family access code</label><input id="tutor-code" type="password" autocomplete="off" aria-describedby="tutor-code-note tutor-code-error" aria-invalid="false" placeholder="Ask a parent for the code"><p id="tutor-code-error" class="code-error" role="alert" hidden></p><p id="tutor-code-note" class="help-note">Use your family code here, never an API key.</p></div>
     </aside>
   </div>
 

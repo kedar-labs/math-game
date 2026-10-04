@@ -44,6 +44,13 @@
   const endpoint = root.MATH_TUTOR_ENDPOINT || '';
   const mode = document.getElementById('help-mode');
   const sendButton = document.querySelector('#help-form button');
+  const codeInput = document.getElementById('tutor-code');
+  const codeError = document.getElementById('tutor-code-error');
+  function setCodeError(message='') {
+    codeInput.setAttribute('aria-invalid',String(Boolean(message)));
+    codeError.textContent=message; codeError.hidden=!message;
+  }
+  codeInput.addEventListener('input',()=>{setCodeError();cancelPending();});
   const explainButton = document.getElementById('help-explain');
   if (endpoint) {
     document.getElementById('tutor-unlock').hidden = false;
@@ -53,8 +60,8 @@
   async function ask() {
     if (!input.value.trim()) return;
     if (!endpoint || problem?.explanation) {reply.textContent=answer(input.value,problem);return;}
-    const code=document.getElementById('tutor-code').value;
-    if (!code) {reply.textContent='Ask a parent to enter the family access code above.';return;}
+    const code=codeInput.value;
+    if (!code) {setCodeError('Enter your family access code below.');codeInput.focus();return;}
     cancelPending();
     const current=revision;
     controller=new AbortController();
@@ -65,6 +72,8 @@
       const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json','X-Tutor-Code':code},body:JSON.stringify({question:input.value,problem}),signal:controller.signal});
       const data=await response.json();
       if(current!==revision)return;
+      if(response.status===401) setCodeError('Incorrect family code. Please try again.');
+      else if(response.ok) setCodeError();
       reply.textContent=response.ok?data.answer:(data.error||'AI Math Help is unavailable.');
       if(response.ok)mode.textContent=data.source==='OpenAI'?'Answered by OpenAI · timed games keep counting.':'Math-only filter · no API call used.';
     } catch {
