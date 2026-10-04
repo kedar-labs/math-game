@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Math Game</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="wrap">
+  <h1>Math Game</h1>
+  <div class="sub">Instructions: Solve problems to remove tiles. 10 correct answers reveal the mystery picture and its name! If the timer runs out, press RESET to start over.</div>
+
+  <!-- Centered control section -->
+  <div class="control-section">
+    <div class="row">
+      <label for="op">Operation</label>
+      <select id="op">
+        <option value="add" selected>Addition</option>
+        <option value="sub">Subtraction</option>
+        <option value="mul">Multiplication</option>
+        <option value="div">Division</option>
+      </select>
+      <label for="timerSelect">Timer</label>
+      <select id="timerSelect">
+        <option value="10">10 sec</option>
+        <option value="20" selected>20 sec</option>
+      </select>
+      <button id="btnStart" class="primary">Start</button>
+      <button id="btnReset">Reset</button>
+    </div>
+  </div>
+
+  <div class="game-layout">
+    <div class="left-panel">
+      <div id="board">
+        <img id="img" alt="Mystery picture" src="about:blank"/>
+      </div>
+      <div id="msg"></div>
+
+    </div>
+
+    <div class="right-panel">
+      <div class="question" id="q">Press Start</div>
+      <div class="answer">
+        <input id="ans" type="number" inputmode="numeric" placeholder="Answer" aria-label="Your answer" />
+        <button id="btnSubmit" class="primary">Enter</button>
+      </div>
+      <div id="timer"><div id="bar"></div></div>
+      <div id="nameArea" class="name-area" aria-live="polite">
+        <div id="nameLabel" class="label">The mystery picture is</div>
+        <div id="name"></div>
+      </div>
+      <div id="reviewFooter" class="footer-note">Please review your answers below</div>
+    </div>
+  </div>
+
+  <div id="history" class="history"></div>
+</div>
+
+
+<script src="game.js" defer></script>
+</body>
+</html>
