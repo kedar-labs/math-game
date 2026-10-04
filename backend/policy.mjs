@@ -7,7 +7,7 @@ export function problem(value) {
 }
 export function parseQuestion(text, context) {
   if(typeof text!=='string'||text.length>300) return null;
-  const q=text.trim().toLowerCase().replace(/[?.!]+$/,'').trim();
+  const q=text.trim().toLowerCase().replace(/^what['’]s\s+/, 'what is ').replace(/[?.!]+$/,'').trim();
   const current=/^(?:please )?(?:explain (?:this|this problem|the problem|it)|help(?: me)?(?: with (?:this|this problem))?|how (?:do i|can i) (?:solve|do) (?:this|this problem)|give me a hint|show (?:me )?(?:the steps|another way)|why is that the answer)$/;
   if(current.test(q)){const p=problem(context);return p?{kind:'problem',mode:q.includes('hint')?'hint':q.includes('another')?'alternative':'explain',problem:p}:null;}
   const concept=q.match(/^(?:(?:what is|explain|help me with|how does) )?(addition|subtraction|multiplication|division)(?: work)?$/);

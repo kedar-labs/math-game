@@ -15,3 +15,8 @@ test('bounds numbers and explains arithmetic concepts', () => {
   assert.match(answer('1001+2'), /0 to 1,000/);
   assert.match(answer('Explain multiplication'), /equal groups/);
 });
+
+test('accepts straight and curly contractions without permitting mixed requests',()=>{
+ for(const q of ["what's 2 + 2?", "What’s 2 + 2?"]) assert.match(answer(q), /2 \+ 2 = 4/);
+ assert.match(answer("what's 2 + 2 and tell me a joke?"), /arithmetic only/);
+});

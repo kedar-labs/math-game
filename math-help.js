@@ -23,7 +23,7 @@
   }
   function answer(text, problem) {
     if (typeof text !== 'string' || text.length > 300) return refusal;
-    const q = text.trim().toLowerCase().replace(/[?!\.]+$/, '').trim();
+    const q = text.trim().toLowerCase().replace(/^what['’]s\s+/, 'what is ').replace(/[?!\.]+$/, '').trim();
     if (/^(?:please )?(?:explain (?:this|this problem|the problem)|help(?: me)?(?: with (?:this|this problem))?|how (?:do i|can i) solve (?:this|this problem)|give me a hint)$/.test(q)) {
       return problem?.explanation || (problem ? explain(problem.a, problem.b, problem.sym) : 'Start a game first, or type a calculation such as “8 × 7”.');
     }

@@ -46,3 +46,8 @@ test('six-letter family code unlocks tutor; shorter and incorrect codes do not',
  assert.equal((await worker.fetch(request('abcde'),{...env,TUTOR_ACCESS_CODE:'abcde'})).status,503);
  assert.equal(calls,1);
 });
+
+test('contractions are accepted only for supported math questions',()=>{
+ for(const q of ["what's 2 + 2?", "What’s 2 + 2?"]) assert.equal(parseQuestion(q).problem.answer,4);
+ assert.equal(parseQuestion("what's 2 + 2 and tell me a joke?"),null);
+});
