@@ -46,7 +46,7 @@ export class Tutor {
       try{
         const audio=await fetch('https://api.openai.com/v1/audio/speech',{
           method:'POST',headers:{Authorization:`Bearer ${this.env.OPENAI_API_KEY}`,'Content-Type':'application/json'},
-          body:JSON.stringify({model:'gpt-4o-mini-tts',voice:body.voice,input:body.text.trim(),response_format:'mp3',instructions:'Speak as a tiny cheerful pink squishy cartoon mascot. Use a naturally high-pitched, bright, light, bouncy voice with warm playful expression. Clear American English, medium pace. Avoid robotic delivery; keep every word easy to understand.'}),signal:AbortSignal.timeout(60000)
+          body:JSON.stringify({model:'gpt-4o-mini-tts',voice:body.voice,input:body.text.trim(),response_format:'mp3',instructions:'Perform an original little-kid cartoon voice for a tiny pink squishy mascot. Sound youthful and childlike, with a naturally high-pitched, small, light voice, bright curiosity, an audible smile, and playful bouncy intonation. Use clear American English and a comfortable medium pace. Keep pronunciation easy to understand. Avoid an adult narrator tone, baby talk, squealing, robotic delivery, or exaggerated chipmunk effects.'}),signal:AbortSignal.timeout(60000)
         });
         if(!audio.ok)return json({error:'Voice generation is unavailable. Check API billing or try later.'},503);
         return new Response(audio.body,{headers:{'Content-Type':'audio/mpeg','Cache-Control':'no-store'}});
