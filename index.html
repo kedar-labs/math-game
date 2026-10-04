@@ -1,64 +1,82 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Math Game</title>
-<link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#e7f4fb">
+  <meta name="description" content="A little math. A little mystery. Solve ten problems to reveal a surprise picture.">
+  <title>Math Game</title>
+  <link rel="stylesheet" href="assets/fonts/fonts.css">
+  <link rel="stylesheet" href="styles.css">
+  <script src="math-help.js" defer></script>
+  <script src="game.js" defer></script>
 </head>
 <body>
-<div class="wrap">
-  <h1>Math Game</h1>
-  <div class="sub">Instructions: Solve problems to remove tiles. 10 correct answers reveal the mystery picture and its name! If the timer runs out, press RESET to start over.</div>
-
-  <!-- Centered control section -->
-  <div class="control-section">
-    <div class="row">
-      <label for="op">Operation</label>
-      <select id="op">
-        <option value="add" selected>Addition</option>
-        <option value="sub">Subtraction</option>
-        <option value="mul">Multiplication</option>
-        <option value="div">Division</option>
-      </select>
-      <label for="timerSelect">Timer</label>
-      <select id="timerSelect">
-        <option value="10">10 sec</option>
-        <option value="20" selected>20 sec</option>
-      </select>
-      <button id="btnStart" class="primary">Start</button>
-      <button id="btnReset">Reset</button>
+<main class="wrap">
+  <header class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow"><span aria-hidden="true">✦</span> A LITTLE MATH. A LITTLE MYSTERY.</p>
+      <h1 aria-label="Math Game"><span aria-hidden="true"><span>M</span><span>a</span><span>t</span><span>h</span> <span>G</span><span>a</span><span>m</span><span>e</span></span></h1>
+      <p class="intro">Solve it. Reveal it. Celebrate!</p>
+      <p class="sub">Ten correct answers unlock your mystery picture.</p>
     </div>
+    <img class="hero-art" src="assets/dumpling-trio.png" alt="Three smiling rainbow dumplings in a bamboo basket" width="340" height="220">
+  </header>
+
+  <section class="settings" aria-label="Game settings">
+    <span class="settings-title">Make it your game</span>
+    <div class="setting"><label for="op">Operation</label><select id="op"><option value="add">Addition ＋</option><option value="sub">Subtraction −</option><option value="mul">Multiplication ×</option><option value="div">Division ÷</option></select></div>
+    <div class="setting"><label for="timerSelect">Time per problem</label><select id="timerSelect"><option value="10">10 seconds</option><option value="20" selected>20 seconds</option></select></div>
+    <div class="setting-actions"><button id="btnStart" class="primary">Start game <span aria-hidden="true">→</span></button><button id="btnReset" class="secondary">Reset</button></div>
+  </section>
+
+  <div class="play-space">
+    <section class="game-panel" aria-label="Math game">
+      <div class="game-layout">
+        <div class="left-panel">
+          <div class="section-heading"><h2>Mystery reveal</h2><span class="progress-pill" id="progress">0 / 10</span></div>
+          <div id="board">
+            <img id="img" alt="Mystery picture" hidden>
+            <div id="board-placeholder" aria-hidden="true">?</div>
+          </div>
+          <div class="progress-dots" id="progress-dots" aria-hidden="true"></div>
+          <p class="board-note" id="board-note">Every correct answer reveals a tile.</p>
+          <p id="image-status" role="status" hidden></p>
+        </div>
+        <div class="right-panel">
+          <div class="question-heading"><span class="eyebrow" id="round-label">READY WHEN YOU ARE</span><span class="sparkle" aria-hidden="true">✧</span></div>
+          <div class="question" id="q" aria-live="polite">Ready to reveal?</div>
+          <p id="feedback" class="feedback" aria-live="polite">Choose your settings, then press Start game.</p>
+          <label class="answer-label" for="ans">Your answer</label>
+          <form class="answer" id="answer-form"><input id="ans" type="number" inputmode="numeric" placeholder="Type here" autocomplete="off" disabled><button id="btnSubmit" class="primary" disabled>Enter <span aria-hidden="true">↵</span></button></form>
+          <div class="timer-label"><span>Time remaining</span><span id="time-left">—</span></div>
+          <div id="timer" role="progressbar" aria-label="Time remaining" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0"><div id="bar"></div></div>
+          <div id="results" class="results" hidden>
+            <div id="nameArea" hidden><p id="nameLabel">The mystery picture is</p><h3 id="name"></h3></div>
+            <p id="reviewFooter">Please review your answers below</p>
+          </div>
+          <p class="timer-note">Out of time? Press Reset for a fresh start.</p>
+        </div>
+      </div>
+    </section>
+
+    <aside class="math-help" aria-labelledby="help-title">
+      <div class="help-heading"><span class="helper-icon" aria-hidden="true">✦</span><div><h2 id="help-title">Math Help</h2><span class="help-tag">LET’S FIGURE IT OUT</span></div></div>
+      <p class="help-intro">Big question? Start with a small step.</p>
+      <p id="help-context">Start a game to ask about your problem.</p>
+      <div id="help-reply" role="status" aria-live="polite">Try “Explain this problem” or “What is 8 × 7?”</div>
+      <form id="help-form"><label for="help-input">Your math question</label><textarea id="help-input" rows="3" maxlength="300" placeholder="How do I solve this?" required></textarea><button class="help-send" type="submit">Send question <span aria-hidden="true">↗</span></button></form>
+      <button id="help-explain" class="help-explain" type="button">Explain this problem</button>
+      <p class="help-note">Built-in arithmetic preview, not AI yet.<br>Your game timer keeps running.</p>
+    </aside>
   </div>
 
-  <div class="game-layout">
-    <div class="left-panel">
-      <div id="board">
-        <img id="img" alt="Mystery picture" src="about:blank"/>
-      </div>
-      <div id="msg"></div>
-
-    </div>
-
-    <div class="right-panel">
-      <div class="question" id="q">Press Start</div>
-      <div class="answer">
-        <input id="ans" type="number" inputmode="numeric" placeholder="Answer" aria-label="Your answer" />
-        <button id="btnSubmit" class="primary">Enter</button>
-      </div>
-      <div id="timer"><div id="bar"></div></div>
-      <div id="nameArea" class="name-area" aria-live="polite">
-        <div id="nameLabel" class="label">The mystery picture is</div>
-        <div id="name"></div>
-      </div>
-      <div id="reviewFooter" class="footer-note">Please review your answers below</div>
-    </div>
-  </div>
-
-  <div id="history" class="history"></div>
-</div>
-
-
-<script src="game.js" defer></script>
+  <section class="history-section" aria-labelledby="history-title">
+    <div class="history-heading"><h2 id="history-title">Your answer trail</h2><span id="history-count">A fresh start</span></div>
+    <p id="history-empty">Your answers will appear here. Every try is a chance to learn.</p>
+    <div id="history" class="history" aria-live="polite"></div>
+  </section>
+  <footer>Small steps. Bright ideas. <span aria-hidden="true">✦</span></footer>
+</main>
 </body>
 </html>

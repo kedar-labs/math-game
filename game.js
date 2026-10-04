@@ -1,13 +1,6 @@
-
-(function(){
-  const el = {
-    op:document.getElementById('op'), start:document.getElementById('btnStart'), reset:document.getElementById('btnReset'),
-    q:document.getElementById('q'), ans:document.getElementById('ans'), submit:document.getElementById('btnSubmit'),
-    bar:document.getElementById('bar'), board:document.getElementById('board'), img:document.getElementById('img'), msg:document.getElementById('msg'),
-    nameArea:document.getElementById('nameArea'), nameLabel:document.getElementById('nameLabel'), name:document.getElementById('name'),
-    timerSelect:document.getElementById('timerSelect'), history:document.getElementById('history'), reviewFooter:document.getElementById('reviewFooter')
-  };
-
+/* Math Game: no dependencies or server required. */
+(function () {
+  'use strict';
   const rewardImages = [
     "https://storage.googleapis.com/labubu-math-game-images/Soymilk.jpeg",
     "https://storage.googleapis.com/labubu-math-game-images/CocaCola.jpeg",
@@ -24,56 +17,149 @@
     "https://storage.googleapis.com/labubu-math-game-sounds/tada-fanfare-a-6313.mp3"
   ];
 
-  function playCelebrationSound(){
-    const url = celebrationSounds[Math.floor(Math.random()*celebrationSounds.length)];
-    const audio = new Audio(url);
-    audio.volume = 0.9;
-    audio.play().catch(err=>console.log('Audio play blocked:',err));
+  const $ = id => document.getElementById(id);
+  const state = {running:false, timer:null, deadline:0, seconds:20, tiles:[], remaining:[], correct:0, attempts:0, problem:null, imageName:'', audio:null};
+  const randomInt = (min,max) => Math.floor(Math.random()*(max-min+1))+min;
+  function randomIndex(length) {
+    if (window.crypto?.getRandomValues) return window.crypto.getRandomValues(new Uint32Array(1))[0] % length;
+    return randomInt(0,length-1);
   }
-
-  let STATE={running:false, secs:10, left:10, timer:null, tiles:[], hiddenIdx:[], removed:0, goal:10, answer:0, imageName:'', cur:{a:0,b:0,sym:'+',ans:0}};
-
-  const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
-  const ri=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
-  function randIndexCrypto(len){ if(window.crypto&&crypto.getRandomValues){ const a=new Uint32Array(1); crypto.getRandomValues(a); return a[0]%len; } return Math.floor(Math.random()*len); }
-
-  function clearTiles(){ STATE.tiles.forEach(t=>t.remove()); STATE.tiles=[]; STATE.hiddenIdx=[]; STATE.removed=0; el.name.style.opacity=0; }
-  function makeTiles(){ clearTiles(); const rows=5, cols=2; for(let r=0;r<rows;r++){ for(let c=0;c<cols;c++){ const d=document.createElement('div'); d.className='tile'; d.style.left=(c*50)+'%'; d.style.top=(r*20)+'%'; d.style.width='50%'; d.style.height='20%'; el.board.appendChild(d); STATE.tiles.push(d);} } STATE.hiddenIdx=STATE.tiles.map((_,i)=>i); }
-  function revealOne(){ if(!STATE.hiddenIdx.length) return; const idx=STATE.hiddenIdx.splice(randIndexCrypto(STATE.hiddenIdx.length),1)[0]; const t=STATE.tiles[idx]; if(!t) return; t.style.opacity=0; setTimeout(()=>t.style.display='none',650); STATE.removed++; if(STATE.removed>=STATE.goal) onRevealed(); }
-
-  function pickRandomImage(){ const url=rewardImages[randIndexCrypto(rewardImages.length)]; const clean=url.split('?')[0]; const withCb=url+(url.includes('?')?'&':'?')+'cb='+Date.now(); el.img.src=withCb; STATE.imageName=clean.split('/').pop().split('.')[0]; }
-
-  function nextQ(){ if(!STATE.running) return; const op=el.op.value; let a=ri(0,10), b=ri(0,10), sym='+', ans=a+b; if(op==='sub'){sym='−';if(a<b){const t=a;a=b;b=t;}ans=a-b;} else if(op==='mul'){sym='×';ans=a*b;} else if(op==='div'){sym='÷';b=ri(1,10);a=b*ri(0,10);ans=a/b;} STATE.answer=ans; STATE.cur={a,b,sym,ans}; el.q.textContent=`${a} ${sym} ${b} = ?`; clearInterval(STATE.timer); STATE.left=parseInt(el.timerSelect.value,10)||10; STATE.secs=STATE.left; tick(); STATE.timer=setInterval(()=>{ STATE.left-=.1; tick(); if(STATE.left<=0){ clearInterval(STATE.timer); el.q.textContent="⏱️ Time's up — press RESET to play again."; STATE.running=false; el.submit.disabled=true; el.ans.disabled=true; showFooter(); addHistory(false, `${a} ${sym} ${b} = ⏱️`, '⏱️', ans); } },100); }
-  function tick(){ el.bar.style.width=clamp((STATE.left/STATE.secs)*100,0,100)+'%'; }
-
-  function start(){ softReset(); el.q.textContent='Get ready!'; el.msg.style.opacity=0; el.msg.textContent=''; pickRandomImage(); makeTiles(); STATE.running=true; el.start.disabled=true; el.submit.disabled=false; el.ans.disabled=false; el.ans.value=''; el.ans.focus(); nextQ(); }
-
-  function softReset(){
-    clearInterval(STATE.timer);
-    STATE.running=false; STATE.left=10; STATE.secs=10; STATE.removed=0; STATE.answer=0;
-    STATE.cur={a:0,b:0,sym:'+',ans:0}; STATE.imageName='';
-    el.start.disabled=false; el.submit.disabled=true; el.ans.disabled=true; el.ans.value='';
-    el.q.textContent='Press Start'; el.msg.textContent=''; el.msg.style.opacity=0; el.name.textContent=''; el.name.style.opacity=0; el.nameArea.style.opacity=0; el.bar.style.width='0%'; el.history.innerHTML='';
-    el.reviewFooter.style.opacity=0;
-    pickRandomImage(); makeTiles();
+  function progress() {
+    $('progress').textContent = `${state.correct} / 10`;
+    Array.from($('progress-dots').children).forEach((dot,i) => dot.className = i < state.correct ? 'done' : '');
   }
-
-  function submit(){ if(!STATE.running) return; const v=parseFloat(el.ans.value); if(!Number.isFinite(v)) return; const {a,b,sym,ans}=STATE.cur; if(v===ans){ addHistory(true, `${a} ${sym} ${b} = ${v}`, null, ans); revealOne(); if(STATE.removed<STATE.goal) nextQ(); } else { el.q.textContent=`Oops — it's ${ans}.`; addHistory(false, `${a} ${sym} ${b} = ${v}`, v, ans); nextQ(); } el.ans.value=''; el.ans.focus(); }
-
-  function onRevealed(){ clearInterval(STATE.timer); STATE.running=false; el.q.textContent='🎉 You revealed the mystery picture!'; el.msg.textContent=''; el.msg.style.opacity=0; el.name.textContent=STATE.imageName||'Mystery picture'; el.name.style.opacity=1; el.nameArea.style.opacity=1; el.submit.disabled=true; el.ans.disabled=true; el.start.disabled=false; playCelebrationSound(); showFooter(); }
-
-  function addHistory(ok,expr,userVal,rightVal){ const card=document.createElement('div'); card.className='hist-card'+(ok?'':' bad'); if(ok){ card.textContent=expr; } else { const wrong=document.createElement('div'); wrong.textContent=expr; card.appendChild(wrong); const right=document.createElement('div'); right.className='right'; right.textContent=`Correct: ${rightVal}`; card.appendChild(right);} el.history.append(card); }
-
-  function showFooter(){
-    el.reviewFooter.style.opacity = 1;
-
+  function coverPicture() {
+    state.tiles.forEach(tile => tile.remove());
+    state.tiles = [];
+    state.remaining = [];
+    for (let i=0;i<10;i++) {
+      const tile = document.createElement('div');
+      tile.className = 'tile';
+      tile.setAttribute('aria-hidden','true');
+      tile.textContent = '?';
+      Object.assign(tile.style,{left:`${i%2*50}%`,top:`${Math.floor(i/2)*20}%`,width:'50%',height:'20%'});
+      $('board').appendChild(tile);
+      state.tiles.push(tile);
+      state.remaining.push(i);
+    }
+    progress();
   }
-
-  el.start.addEventListener('click',start);
-  el.reset.addEventListener('click',softReset);
-  el.submit.addEventListener('click',submit);
-  el.ans.addEventListener('keydown',e=>{if(e.key==='Enter')submit();});
-
-  window.addEventListener('load',()=>{pickRandomImage();makeTiles();el.history.innerHTML='';el.submit.disabled=true;el.ans.disabled=true;});
+  function pickPicture() {
+    const url = rewardImages[randomIndex(rewardImages.length)];
+    state.imageName = url.split('/').pop().split('.')[0];
+    $('img').hidden = true;
+    $('board-placeholder').hidden = false;
+    $('image-status').hidden = true;
+    $('img').alt = 'Mystery picture';
+    $('img').src = url;
+  }
+  $('img').addEventListener('load', () => { $('img').hidden = false; $('board-placeholder').hidden = true; });
+  $('img').addEventListener('error', () => { $('image-status').textContent = 'The picture could not load. You can still practice, or reset to try another.'; $('image-status').hidden = false; });
+  function setTime(left) {
+    const remaining = Math.max(0,left);
+    $('bar').style.width = `${Math.min(100,remaining/state.seconds*100)}%`;
+    $('time-left').textContent = `${Math.ceil(remaining)}s`;
+    $('timer').setAttribute('aria-valuemax',state.seconds);
+    $('timer').setAttribute('aria-valuenow',Math.ceil(remaining));
+  }
+  function stopTimer() { clearInterval(state.timer); state.timer = null; }
+  function history(ok, value, timeout=false) {
+    const {a,b,sym,ans} = state.problem;
+    const card = document.createElement('div');
+    card.className = 'hist-card'+(ok?'':' bad');
+    const expression = document.createElement('div');
+    expression.textContent = `${ok?'✓':timeout?'◷':'✕'} ${a} ${sym} ${b} = ${timeout?'Time’s up':value}`;
+    card.appendChild(expression);
+    if (!ok) { const correction = document.createElement('div'); correction.className='right'; correction.textContent=`Correct answer: ${ans}`; card.appendChild(correction); }
+    $('history').appendChild(card);
+    state.attempts++;
+    $('history-empty').hidden = true;
+    $('history-count').textContent = `${state.correct} correct · ${state.attempts} ${state.attempts===1?'try':'tries'}`;
+  }
+  function timeout() {
+    stopTimer(); state.running=false; setTime(0);
+    $('q').textContent = 'Time’s up!';
+    $('round-label').textContent = 'A FRESH START AWAITS';
+    $('feedback').textContent = 'Press Reset, then try again. You’ve got this.';
+    $('feedback').className = 'feedback';
+    $('ans').disabled = true; $('btnSubmit').disabled = true;
+    $('results').hidden = false; $('nameArea').hidden = true;
+    history(false,null,true);
+  }
+  function nextQuestion() {
+    let a=randomInt(0,10),b=randomInt(0,10),sym='+',ans=a+b;
+    if ($('op').value==='sub') { sym='−'; if(a<b) [a,b]=[b,a]; ans=a-b; }
+    if ($('op').value==='mul') { sym='×'; ans=a*b; }
+    if ($('op').value==='div') { sym='÷'; b=randomInt(1,10); a=b*randomInt(0,10); ans=a/b; }
+    state.problem={a,b,sym,ans};
+    window.MathHelp.setProblem(state.problem);
+    $('q').textContent=`${a} ${sym} ${b} = ?`;
+    $('round-label').textContent='ONE PROBLEM AT A TIME';
+    state.seconds=Number($('timerSelect').value);
+    state.deadline=Date.now()+state.seconds*1000;
+    stopTimer(); setTime(state.seconds);
+    state.timer=setInterval(() => {const left=(state.deadline-Date.now())/1000; setTime(left); if(left<=0) timeout();},100);
+  }
+  function celebrate() {
+    stopTimer(); state.running=false;
+    $('q').textContent='Mystery solved!';
+    $('round-label').textContent='TEN OUT OF TEN';
+    $('feedback').textContent='Look what a little persistence can do.';
+    $('feedback').className='feedback good';
+    $('ans').disabled=true; $('btnSubmit').disabled=true; $('btnStart').disabled=false;
+    $('name').textContent=state.imageName || 'Mystery picture';
+    $('img').alt=state.imageName || 'Revealed picture';
+    $('results').hidden=false; $('nameArea').hidden=false;
+    $('board-note').textContent='You did it! All ten tiles revealed.';
+    state.audio = new Audio(celebrationSounds[randomIndex(celebrationSounds.length)]);
+    state.audio.volume=.9;
+    state.audio.play().catch(() => {});
+  }
+  function reset() {
+    stopTimer();
+    if (state.audio) {state.audio.pause(); state.audio=null;}
+    Object.assign(state,{running:false,correct:0,attempts:0,problem:null});
+    $('btnStart').disabled=false; $('ans').disabled=true; $('btnSubmit').disabled=true;
+    $('ans').value=''; $('q').textContent='Ready to reveal?';
+    $('round-label').textContent='READY WHEN YOU ARE';
+    $('feedback').textContent='Choose your settings, then press Start game.'; $('feedback').className='feedback';
+    $('results').hidden=true; $('nameArea').hidden=true; $('name').textContent='';
+    $('history').replaceChildren(); $('history-empty').hidden=false; $('history-count').textContent='A fresh start';
+    $('board-note').textContent='Every correct answer reveals a tile.';
+    state.seconds=Number($('timerSelect').value); setTime(0); $('time-left').textContent='—';
+    window.MathHelp.reset();
+    pickPicture(); coverPicture();
+  }
+  function start() {
+    reset(); state.running=true;
+    $('btnStart').disabled=true; $('ans').disabled=false; $('btnSubmit').disabled=false;
+    $('feedback').textContent='Take a breath. You’ve got this.';
+    nextQuestion(); $('ans').focus();
+  }
+  function submit(event) {
+    event.preventDefault();
+    if (!state.running) return;
+    if (Date.now()>=state.deadline) {timeout();return;}
+    if (!$('ans').value.trim()) return;
+    const value=Number($('ans').value);
+    if (!Number.isFinite(value)) return;
+    const ok=value===state.problem.ans;
+    if (ok) state.correct++;
+    history(ok,value);
+    if(ok) {
+      const index=state.remaining.splice(randomIndex(state.remaining.length),1)[0];
+      state.tiles[index].classList.add('revealed'); progress();
+      $('feedback').textContent='Nice work! One more piece of the mystery.'; $('feedback').className='feedback good';
+      if(state.correct===10) celebrate(); else nextQuestion();
+    } else {
+      $('feedback').textContent=`That one was ${state.problem.ans}. Let’s try the next problem.`; $('feedback').className='feedback bad';
+      nextQuestion();
+    }
+    $('ans').value=''; if(state.running) $('ans').focus();
+  }
+  for(let i=0;i<10;i++) $('progress-dots').appendChild(document.createElement('span'));
+  $('btnStart').addEventListener('click',start);
+  $('btnReset').addEventListener('click',reset);
+  $('answer-form').addEventListener('submit',submit);
+  reset();
 })();
-
