@@ -26,7 +26,7 @@
 
   <section class="settings" aria-label="Game settings">
     <span class="settings-title">Make it your game</span>
-    <div class="setting"><label for="op">Operation</label><select id="op"><option value="add">Addition ＋</option><option value="sub">Subtraction −</option><option value="mul">Multiplication ×</option><option value="div">Division ÷</option></select></div>
+    <div class="setting"><label for="op">Topic</label><select id="op"><option value="add">Addition ＋</option><option value="sub">Subtraction −</option><option value="mul">Multiplication ×</option><option value="div">Division ÷</option><option value="fraction-mul">Multiply fractions · area models</option><option value="fraction-div">Divide non-unit fractions</option><option value="area">Area and multiplication</option></select></div>
     <div class="setting"><label for="timerSelect">Time per problem</label><select id="timerSelect"><option value="10">10 seconds</option><option value="20" selected>20 seconds</option></select></div>
     <div class="setting-actions"><button id="btnStart" class="primary">Start game <span aria-hidden="true">→</span></button><button id="btnReset" class="secondary">Reset</button></div>
   </section>
@@ -47,9 +47,11 @@
         <div class="right-panel">
           <div class="question-heading"><span class="eyebrow" id="round-label">READY WHEN YOU ARE</span><span class="sparkle" aria-hidden="true">✧</span></div>
           <div class="question" id="q" aria-live="polite">Ready to reveal?</div>
+          <div id="area-model" class="area-model" hidden></div>
+          <p id="answer-hint" class="help-note" hidden>Use a fraction like 3/4, a whole number, or an exact decimal.</p>
           <p id="feedback" class="feedback" aria-live="polite">Choose your settings, then press Start game.</p>
           <label class="answer-label" for="ans">Your answer</label>
-          <form class="answer" id="answer-form"><input id="ans" type="number" inputmode="numeric" placeholder="Type here" autocomplete="off" disabled><button id="btnSubmit" class="primary" disabled>Enter <span aria-hidden="true">↵</span></button></form>
+          <form class="answer" id="answer-form"><input id="ans" type="text" inputmode="text" placeholder="Type here" autocomplete="off" disabled><button id="btnSubmit" class="primary" disabled>Enter <span aria-hidden="true">↵</span></button></form>
           <div class="timer-label"><span>Time remaining</span><span id="time-left">—</span></div>
           <div id="timer" role="progressbar" aria-label="Time remaining" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0"><div id="bar"></div></div>
           <div id="results" class="results" hidden>

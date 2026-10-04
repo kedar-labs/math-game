@@ -25,7 +25,7 @@
     if (typeof text !== 'string' || text.length > 300) return refusal;
     const q = text.trim().toLowerCase().replace(/[?!\.]+$/, '').trim();
     if (/^(?:please )?(?:explain (?:this|this problem|the problem)|help(?: me)?(?: with (?:this|this problem))?|how (?:do i|can i) solve (?:this|this problem)|give me a hint)$/.test(q)) {
-      return problem ? explain(problem.a, problem.b, problem.sym) : 'Start a game first, or type a calculation such as “8 × 7”.';
+      return problem?.explanation || (problem ? explain(problem.a, problem.b, problem.sym) : 'Start a game first, or type a calculation such as “8 × 7”.');
     }
     const concept = q.match(/^(?:(?:what is|explain|help me with) )?(addition|subtraction|multiplication|division)$/);
     if (concept) return concepts[concept[1]];
@@ -52,7 +52,7 @@
   function cancelPending() {revision++;controller?.abort();controller=null;sendButton.disabled=false;explainButton.disabled=false;}
   async function ask() {
     if (!input.value.trim()) return;
-    if (!endpoint) {reply.textContent=answer(input.value,problem);return;}
+    if (!endpoint || problem?.explanation) {reply.textContent=answer(input.value,problem);return;}
     const code=document.getElementById('tutor-code').value;
     if (!code) {reply.textContent='Ask a parent to enter the family access code above.';return;}
     cancelPending();
@@ -78,7 +78,7 @@
     setProblem(value) {
       cancelPending();
       problem = {...value};
-      context.textContent = `Current problem: ${problem.a} ${problem.sym} ${problem.b} = ?`;
+      context.textContent = `Current problem: ${problem.expression || `${problem.a} ${problem.sym} ${problem.b}`} = ?`;
       reply.textContent = 'Ask me to explain this problem, or type another arithmetic question.';
     },
     reset() {
