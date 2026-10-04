@@ -10,7 +10,11 @@
   };
   function explain(a, b, sym) {
     if (![a,b].every(n => Number.isInteger(n) && n >= 0 && n <= 1000)) return 'For this preview, use whole numbers from 0 to 1,000.';
-    if (sym === '+') return `${a} + ${b} = ${a + b}.\nStart with ${a}, then add ${b} more. You can split ${b} into tens and ones to add in smaller steps.`;
+    if (sym === '+') {
+      const toTen = (10 - a % 10) % 10;
+      if (toTen > 0 && b >= toTen) return `${a} + ${b} = ${a + b}.\nAdd ${toTen} to ${a} to make ${a + toTen}. Then add the remaining ${b - toTen} to get ${a + b}.`;
+      return `${a} + ${b} = ${a + b}.\nStart at ${a} and count forward ${b} steps to reach ${a + b}.`;
+    }
     if (sym === '−') return `${a} − ${b} = ${a - b}.\nStart at ${a} and move back ${b} on a number line.${b > a ? ' You pass zero, so the answer is negative.' : ''}`;
     if (sym === '×') return `${a} × ${b} = ${a * b}.\nThink of ${a} equal groups with ${b} in each group.${a === 0 || b === 0 ? ' Zero groups or zero in each group gives zero.' : ` Add ${b} a total of ${a} times.`}`;
     if (b === 0) return 'You cannot divide by zero. Equal groups of zero cannot make a nonzero total, and 0 ÷ 0 has no single answer.';
@@ -36,14 +40,49 @@
   const input = document.getElementById('help-input');
   const reply = document.getElementById('help-reply');
   const context = document.getElementById('help-context');
-  let problem = null;
+  let problem = null, revision = 0, controller = null;
+  const endpoint = root.MATH_TUTOR_ENDPOINT || '';
+  const mode = document.getElementById('help-mode');
+  const sendButton = document.querySelector('#help-form button');
+  const explainButton = document.getElementById('help-explain');
+  if (endpoint) {
+    document.getElementById('tutor-unlock').hidden = false;
+    mode.textContent = 'AI Math Help · family code required. The game timer keeps running.';
+  }
+  function cancelPending() {revision++;controller?.abort();controller=null;sendButton.disabled=false;explainButton.disabled=false;}
+  async function ask() {
+    if (!input.value.trim()) return;
+    if (!endpoint) {reply.textContent=answer(input.value,problem);return;}
+    const code=document.getElementById('tutor-code').value;
+    if (!code) {reply.textContent='Ask a parent to enter the family access code above.';return;}
+    cancelPending();
+    const current=revision;
+    controller=new AbortController();
+    const timer=setTimeout(()=>controller?.abort(),25000);
+    sendButton.disabled=true;explainButton.disabled=true;
+    reply.textContent='Thinking through the math…';
+    try {
+      const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json','X-Tutor-Code':code},body:JSON.stringify({question:input.value,problem}),signal:controller.signal});
+      const data=await response.json();
+      if(current!==revision)return;
+      reply.textContent=response.ok?data.answer:(data.error||'AI Math Help is unavailable.');
+      if(response.ok)mode.textContent=data.source==='OpenAI'?'Answered by OpenAI · game timer keeps running.':'Math-only filter · no API call used.';
+    } catch {
+      if(current===revision)reply.textContent='Could not connect to AI Math Help. Please try again later.';
+    } finally {
+      clearTimeout(timer);
+      if(current===revision){sendButton.disabled=false;explainButton.disabled=false;controller=null;}
+    }
+  }
   root.MathHelp = {
     setProblem(value) {
+      cancelPending();
       problem = {...value};
       context.textContent = `Current problem: ${problem.a} ${problem.sym} ${problem.b} = ?`;
       reply.textContent = 'Ask me to explain this problem, or type another arithmetic question.';
     },
     reset() {
+      cancelPending();
       problem = null;
       input.value = '';
       context.textContent = 'Start a game to ask about your problem.';
@@ -53,10 +92,10 @@
   document.getElementById('help-form').addEventListener('submit', event => {
     event.preventDefault();
     if (!input.value.trim()) return;
-    reply.textContent = answer(input.value, problem);
+    ask();
   });
   document.getElementById('help-explain').addEventListener('click', () => {
     input.value = 'Explain this problem';
-    reply.textContent = answer(input.value, problem);
+    ask();
   });
 })(typeof window !== 'undefined' ? window : globalThis);

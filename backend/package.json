@@ -1,0 +1,13 @@
+{
+  "devDependencies": {
+    "wrangler": "^4.147.0"
+  },
+  "name": "math-game-tutor",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "check": "wrangler deploy --dry-run"
+  }
+}

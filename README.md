@@ -25,7 +25,7 @@ GitHub Pages deploys the root of `main`. Commit and push edits to publish; no bu
 
 The side panel currently uses local arithmetic templates. It understands the current game problem, basic calculations, and four arithmetic concepts. Other inputs receive a fixed arithmetic-only response. It does not contact OpenAI, use a microphone, or store chat messages. The game timer continues while using it.
 
-The user approved planning an API tutor with a $5/month budget. No API key or live API billing is configured. To connect it safely:
+The user approved planning an API tutor with a $5/month budget. The backend and frontend connection are now implemented but not deployed or authenticated. See `backend/README.md` for secure connection steps and budget limits. No API key or live API billing is configured. To connect it safely:
 
 1. Set up a dedicated project and API billing at https://platform.openai.com/; API billing is separate from ChatGPT subscriptions.
 2. Create a project API key and store it only as a secret on the selected backend host. Never paste it in chat, browser JavaScript, GitHub files, or localStorage.

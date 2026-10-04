@@ -2,3 +2,9 @@ work/
 .DS_Store
 .openai/
 dist/
+.env
+.env.*
+.dev.vars
+.dev.vars.*
+.wrangler/
+node_modules/
