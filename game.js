@@ -113,7 +113,7 @@
       $('easy-task').textContent=sharing?'Dark purple is one person’s share. What fraction of the whole is it?':'Each bar is one whole. Count all the purple pieces.';
       const bars=$('easy-bars');bars.replaceChildren();
       for(let r=0;r<(sharing?1:amount);r++){
-        const bar=document.createElement('div');bar.className='fraction-bar';
+        const bar=document.createElement('div');bar.className=sharing?'fraction-bar sharing-bar':'fraction-bar whole-bar';
         const parts=sharing?denominator*amount:denominator;
         bar.style.gridTemplateColumns=`repeat(${parts},minmax(0,1fr))`;
         bar.setAttribute('role','img');bar.setAttribute('aria-label',sharing?`One whole with ${parts} equal parts. ${amount} parts are shaded; one dark part is one person's share.`:`One whole split into ${parts} purple pieces.`);
