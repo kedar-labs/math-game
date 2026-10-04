@@ -27,7 +27,7 @@
   <section class="settings" aria-label="Game settings">
     <span class="settings-title">Make it your game</span>
     <div class="setting"><label for="op">Topic</label><select id="op"><option value="add">Addition ＋</option><option value="sub">Subtraction −</option><option value="mul">Multiplication ×</option><option value="div">Division ÷</option><option value="fraction-mul">Multiply fractions · area models</option><option value="fraction-div">Divide non-unit fractions</option><option value="area">Area and multiplication</option></select></div>
-    <div class="setting"><label for="timerSelect">Time per problem</label><select id="timerSelect"><option value="10">10 seconds</option><option value="20" selected>20 seconds</option></select></div>
+    <div class="setting"><label for="timerSelect">Time per problem</label><select id="timerSelect"><option value="0">No timer</option><option value="10">10 seconds</option><option value="20" selected>20 seconds</option></select></div>
     <div class="setting-actions"><button id="btnStart" class="primary">Start game <span aria-hidden="true">→</span></button><button id="btnReset" class="secondary">Reset</button></div>
   </section>
 
@@ -58,7 +58,7 @@
             <div id="nameArea" hidden><p id="nameLabel">The mystery picture is</p><h3 id="name"></h3></div>
             <p id="reviewFooter">Please review your answers below</p>
           </div>
-          <p class="timer-note">Out of time? Press Reset for a fresh start.</p>
+          <p class="timer-note" id="timer-note">Out of time? Press Reset for a fresh start.</p>
         </div>
       </div>
     </section>
@@ -71,7 +71,7 @@
       <div id="tutor-unlock" hidden><label for="tutor-code">Family access code</label><input id="tutor-code" type="password" autocomplete="off" placeholder="Ask a parent for the code"><p class="help-note">Use your family code here, never an API key.</p></div>
       <form id="help-form"><label for="help-input">Your math question</label><textarea id="help-input" rows="3" maxlength="300" placeholder="How do I solve this?" required></textarea><button class="help-send" type="submit">Send question <span aria-hidden="true">↗</span></button></form>
       <button id="help-explain" class="help-explain" type="button">Explain this problem</button>
-      <p class="help-note" id="help-mode">Built-in arithmetic preview, not AI yet.<br>Your game timer keeps running.</p>
+      <p class="help-note" id="help-mode">Built-in arithmetic preview, not AI yet.<br>Timed games keep counting while you ask for help.</p>
     </aside>
   </div>
 

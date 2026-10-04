@@ -50,3 +50,14 @@ test('fraction and area topics accept exact equivalents and show models',()=>{
   g.els.btnReset.fire('click');assert.equal(g.els['area-model'].hidden,true);
  }
 });
+
+test('untimed games have no countdown or timeout and still finish and restart',()=>{
+ const g=game();g.els.timerSelect.value='0';g.start();
+ assert.equal(g.timers.size,0);assert.equal(g.els.timer.hidden,true);assert.equal(g.els['time-left'].textContent,'Unlimited');
+ g.advance(24*60*60*1000);g.answer(g.problem.ans+1);assert.equal(g.els.ans.disabled,false);
+ for(let i=0;i<10;i++){g.advance(60*60*1000);g.answer(g.problem.ans);}
+ assert.equal(g.els.progress.textContent,'10 / 10');assert.equal(g.els.results.hidden,false);
+ g.start();assert.equal(g.els.history.children.length,0);assert.equal(g.timers.size,0);
+ g.els.btnReset.fire('click');g.els.timerSelect.value='10';g.start();
+ assert.equal(g.els.timer.hidden,false);assert.equal(g.timers.size,1);g.advance(10000);assert.equal(g.els.ans.disabled,true);
+});

@@ -57,10 +57,16 @@
   $('img').addEventListener('error', () => { $('image-status').textContent = 'The picture could not load. You can still practice, or reset to try another.'; $('image-status').hidden = false; });
   function setTime(left) {
     const remaining = Math.max(0,left);
-    $('bar').style.width = `${Math.min(100,remaining/state.seconds*100)}%`;
+    $('bar').style.width = `${Math.min(100,(state.seconds ? remaining/state.seconds*100 : 0))}%`;
     $('time-left').textContent = `${Math.ceil(remaining)}s`;
     $('timer').setAttribute('aria-valuemax',state.seconds);
     $('timer').setAttribute('aria-valuenow',Math.ceil(remaining));
+  }
+  function updateTimerDisplay() {
+    const untimed=state.seconds===0;
+    $('timer').hidden=untimed;
+    $('timer-note').textContent=untimed?'Take your time. There’s no countdown.':'Out of time? Press Reset for a fresh start.';
+    if(untimed) $('time-left').textContent='Unlimited';
   }
   function stopTimer() { clearInterval(state.timer); state.timer = null; }
   function history(ok, value, timeout=false) {
@@ -127,8 +133,10 @@
     $('q').textContent=state.problem.prompt || `${state.problem.expression || `${a} ${sym} ${b}`} = ?`;
     $('round-label').textContent='ONE PROBLEM AT A TIME';
     state.seconds=Number($('timerSelect').value);
-    state.deadline=Date.now()+state.seconds*1000;
+    state.deadline=state.seconds ? Date.now()+state.seconds*1000 : Infinity;
     stopTimer(); setTime(state.seconds);
+    updateTimerDisplay();
+    if (!state.seconds) return;
     state.timer=setInterval(() => {const left=(state.deadline-Date.now())/1000; setTime(left); if(left<=0) timeout();},100);
   }
   function celebrate() {
@@ -158,7 +166,7 @@
     $('results').hidden=true; $('nameArea').hidden=true; $('name').textContent='';
     $('history').replaceChildren(); $('history-empty').hidden=false; $('history-count').textContent='A fresh start';
     $('board-note').textContent='Every correct answer reveals a tile.';
-    state.seconds=Number($('timerSelect').value); setTime(0); $('time-left').textContent='—';
+    state.seconds=Number($('timerSelect').value); setTime(0); $('time-left').textContent='—'; updateTimerDisplay();
     window.MathHelp.reset();
     pickPicture(); coverPicture();
   }

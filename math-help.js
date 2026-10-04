@@ -47,7 +47,7 @@
   const explainButton = document.getElementById('help-explain');
   if (endpoint) {
     document.getElementById('tutor-unlock').hidden = false;
-    mode.textContent = 'AI Math Help · family code required. The game timer keeps running.';
+    mode.textContent = 'AI Math Help · family code required. Timed games keep counting while you ask for help.';
   }
   function cancelPending() {revision++;controller?.abort();controller=null;sendButton.disabled=false;explainButton.disabled=false;}
   async function ask() {
@@ -66,7 +66,7 @@
       const data=await response.json();
       if(current!==revision)return;
       reply.textContent=response.ok?data.answer:(data.error||'AI Math Help is unavailable.');
-      if(response.ok)mode.textContent=data.source==='OpenAI'?'Answered by OpenAI · game timer keeps running.':'Math-only filter · no API call used.';
+      if(response.ok)mode.textContent=data.source==='OpenAI'?'Answered by OpenAI · timed games keep counting.':'Math-only filter · no API call used.';
     } catch {
       if(current===revision)reply.textContent='Could not connect to AI Math Help. Please try again later.';
     } finally {
