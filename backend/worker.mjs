@@ -13,7 +13,7 @@ export default {
     try{
       if(new URL(request.url).pathname!=='/help')result=json({error:'Not found.'},404);
       else if(request.method!=='POST')result=json({error:'Use POST.'},405);
-      else if(!env.OPENAI_API_KEY||!env.TUTOR_ACCESS_CODE||env.TUTOR_ACCESS_CODE.length<12)result=json({error:'AI tutor setup is not complete.'},503);
+      else if(!env.OPENAI_API_KEY||!env.TUTOR_ACCESS_CODE||env.TUTOR_ACCESS_CODE.length<6)result=json({error:'AI tutor setup is not complete.'},503);
       else if(request.headers.get('X-Tutor-Code')!==env.TUTOR_ACCESS_CODE)result=json({error:'Enter the family access code to use AI Math Help.'},401);
       else result=await env.TUTOR.get(env.TUTOR.idFromName('family-budget-v1')).fetch(request);
     }catch{result=json({error:'Math Help is temporarily unavailable. Please try later.'},503);}

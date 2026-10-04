@@ -36,3 +36,13 @@ test('API call uses canonical input, token cap, no storage; no key returned',asy
  globalThis.fetch=async(url,options)=>{assert.equal(url,'https://api.openai.com/v1/responses');const body=JSON.parse(options.body);assert.equal(body.store,false);assert.equal(body.max_output_tokens,350);assert.equal(JSON.parse(body.input).problem.answer,12);return Response.json({status:'completed',output:[{type:'message',content:[{type:'output_text',text:'Add 2 to make 10, then add 2 more to get 12.'}]}]});};
  try{const r=await tutor.fetch(new Request('https://test/help',{method:'POST',body:JSON.stringify({question:'Explain this problem',problem:{a:8,b:4,sym:'+'}})}));const data=await r.json();assert.equal(data.source,'OpenAI');assert.ok(!JSON.stringify(data).includes('secret-test'));assert.equal(ledger.reservedCents,1);}finally{globalThis.fetch=old;}
 });
+
+test('six-letter family code unlocks tutor; shorter and incorrect codes do not',async()=>{
+ let calls=0;
+ const env={OPENAI_API_KEY:'test',TUTOR_ACCESS_CODE:'abcdef',TUTOR:{idFromName:()=> 'budget',get:()=>({fetch:async()=>{calls++;return Response.json({answer:'ok'});}})}};
+ const request=code=>new Request('https://example.com/help',{method:'POST',headers:{Origin:'https://kedar-labs.github.io','X-Tutor-Code':code}});
+ assert.equal((await worker.fetch(request('abcdef'),env)).status,200);
+ assert.equal((await worker.fetch(request('ABCDEF'),env)).status,401);
+ assert.equal((await worker.fetch(request('abcde'),{...env,TUTOR_ACCESS_CODE:'abcde'})).status,503);
+ assert.equal(calls,1);
+});

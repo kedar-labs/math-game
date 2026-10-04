@@ -10,7 +10,7 @@ From this folder, after signing into your personal Cloudflare account:
 2. `npx wrangler login`
 3. `npx wrangler deploy` (the endpoint refuses all AI requests until both secrets exist)
 4. `npx wrangler secret put OPENAI_API_KEY` — paste your dedicated project key only into the hidden terminal prompt, never chat or source.
-5. `npx wrangler secret put TUTOR_ACCESS_CODE` — enter a distinct random family code of at least 12 characters. This is not the API key.
+5. `npx wrangler secret put TUTOR_ACCESS_CODE` — enter a distinct random family code of six letters (case-sensitive); longer codes also work. This is not the API key.
 6. Set `window.MATH_TUTOR_ENDPOINT` in `../tutor-config.js` to the returned HTTPS Workers URL followed by `/help`.
 7. Test an authenticated arithmetic question, an unrelated question, and an incorrect access code. Then commit and push frontend changes.
 
