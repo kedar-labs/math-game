@@ -71,3 +71,19 @@ footer{text-align:center;margin:28px 0 8px;font-size:11px;letter-spacing:.7px;co
 .hero-guide{display:flex;flex-direction:column;align-items:center;flex-shrink:0;align-self:center;margin-top:-20px}
 .hero-guide #tour-open{margin-top:-8px}
 @media(max-width:540px){.hero{flex-wrap:wrap}.hero-copy{width:100%}.hero-guide{position:static;margin:8px 0 0 auto}.hero-guide .hero-art{position:static;width:115px;height:80px}.hero-guide #tour-open{margin-top:0;font-size:12px;padding:7px 12px}}
+
+/* Phone controls remain readable and usable without sideways scrolling. */
+@media(max-width:540px){
+  h1{font-size:clamp(40px,13vw,51px)}
+  .setting{flex:1 1 100%;min-width:0}
+  .setting select{min-width:0;font-size:16px;min-height:48px}
+  #help-input,#tutor-code,.tour-practice input{font-size:16px}
+  .help-explain,.tour-balloon nav button,.tour-practice button{min-height:44px}
+  .tour-balloon{min-width:0;max-height:calc(100dvh - 36px);overflow-y:auto}
+  .tour-practice{flex-wrap:wrap}
+  .tour-practice input{flex:1 1 80px;width:100%;min-height:44px}
+  .tour-balloon nav{gap:6px}
+  .tour-balloon nav button{padding:9px 10px}
+  .history-heading{flex-wrap:wrap}
+}
+@media(max-height:500px){.tour-balloon{max-height:calc(100dvh - 36px);overflow-y:auto}}
