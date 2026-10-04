@@ -52,3 +52,5 @@ footer{text-align:center;margin:28px 0 8px;font-size:11px;letter-spacing:.7px;co
 .area-model {display:grid;gap:2px;max-width:220px;aspect-ratio:1;margin:12px auto;border:2px solid #756297;background:#fff;padding:3px}.model-cell{background:#f6f3fa;border:1px solid #ddd4ec}.row-shade{background:#f5bcd9}.col-shade{background:#a8def4}.overlap{background:#b898de}.area-model[hidden]{display:none}
 
 #tutor-unlock{margin-top:20px;padding-top:18px;border-top:1px solid #e6dbed}#tutor-code[aria-invalid="true"]{border:2px solid #b42338;background:#fff2f3;color:#9b1c30}#tutor-code[aria-invalid="true"]:focus{outline-color:#b42338}.code-error{color:#b42338;font-size:13px;margin:8px 0}
+
+.model-guide{margin:16px 0;text-align:center}.model-guide figcaption{font-weight:800;font-size:14px}.model-columns{font-size:13px;color:#285c79;margin:10px 0 5px}.model-layout{display:flex;align-items:center;justify-content:center;gap:8px}.model-rows{font-size:13px;color:#8d365e;max-width:66px}.model-layout .area-model{width:100%;margin:0;flex:1}.model-key{font-size:12px;margin:10px 0 5px}.model-task{font-size:14px;font-weight:700;margin:0;line-height:1.5}

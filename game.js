@@ -98,7 +98,7 @@
     const g=gcd(n,d); return d/g===1 ? String(n/g) : `${n/g}/${d/g}`;
   }
   function enrichProblem(topic) {
-    const model=$('area-model'); model.replaceChildren(); model.hidden=true;
+    const model=$('area-model'); model.replaceChildren(); model.hidden=true; $('model-guide').hidden=true;
     $('answer-hint').hidden=!topic.startsWith('fraction');
     if (!['fraction-mul','fraction-div','area'].includes(topic)) return;
     const d=randomInt(3,6), e=randomInt(3,6), n=randomInt(2,d-1), m=randomInt(2,e-1);
@@ -115,6 +115,14 @@
     }
     state.problem=p;
     if(p.rows){
+      $('model-guide').hidden=false;
+      const fractions=topic==='fraction-mul';
+      $('model-title').textContent=fractions?'The whole square represents 1':'Each small square is 1 square unit';
+      $('model-columns').textContent=fractions?`${p.shadeCols}/${p.cols} across → (${p.shadeCols} of ${p.cols} columns)`:`${p.cols} columns →`;
+      $('model-rows').textContent=fractions?`${p.shadeRows}/${p.rows} down ↓`:`${p.rows} rows ↓`;
+      $('model-key').textContent=fractions?'Blue = columns · Pink = rows · Purple = both':'';
+      $('model-task').textContent=fractions?'Count the purple squares. What fraction of ALL the small squares is purple?':'Count the squares, or multiply rows × columns.';
+      model.style.aspectRatio=fractions?'1':`${p.cols} / ${p.rows}`;
       model.hidden=false;model.style.gridTemplateColumns=`repeat(${p.cols}, 1fr)`;
       model.setAttribute('role','img');model.setAttribute('aria-label',topic==='area'?`${p.rows} rows and ${p.cols} columns of unit squares`:`A unit square divided into ${p.rows} rows and ${p.cols} columns; ${p.shadeRows} rows shaded pink, ${p.shadeCols} columns blue. Purple shows their overlap.`);
       for(let r=0;r<p.rows;r++)for(let c=0;c<p.cols;c++){
@@ -162,7 +170,7 @@
     $('ans').value=''; $('q').textContent='Ready to reveal?';
     $('round-label').textContent='READY WHEN YOU ARE';
     $('feedback').textContent='Choose your settings, then press Start game.'; $('feedback').className='feedback';
-    $('area-model').hidden=true; $('answer-hint').hidden=true;
+    $('area-model').hidden=true; $('model-guide').hidden=true; $('answer-hint').hidden=true;
     $('results').hidden=true; $('nameArea').hidden=true; $('name').textContent='';
     $('history').replaceChildren(); $('history-empty').hidden=false; $('history-count').textContent='A fresh start';
     $('board-note').textContent='Every correct answer reveals a tile.';
@@ -194,7 +202,7 @@
       $('feedback').textContent='Nice work! One more piece of the mystery.'; $('feedback').className='feedback good';
       if(state.correct===10) celebrate(); else nextQuestion();
     } else {
-      $('feedback').textContent=`That one was ${state.problem.answerText || state.problem.ans}. Let’s try the next problem.`; $('feedback').className='feedback bad';
+      $('feedback').textContent=`Previous question: ${state.problem.expression || `${state.problem.a} ${state.problem.sym} ${state.problem.b}`} = ${state.problem.answerText || state.problem.ans}. Try this new one.`; $('feedback').className='feedback bad';
       nextQuestion();
     }
     $('ans').value=''; if(state.running) $('ans').focus();
