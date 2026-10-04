@@ -61,3 +61,28 @@ test('untimed games have no countdown or timeout and still finish and restart',(
  g.els.btnReset.fire('click');g.els.timerSelect.value='10';g.start();
  assert.equal(g.els.timer.hidden,false);assert.equal(g.timers.size,1);g.advance(10000);assert.equal(g.els.ans.disabled,true);
 });
+
+test('division bars share a whole and their shaded ratio matches the answer',()=>{
+ const g=game();g.els.op.value='fraction-div';
+ for(let i=0;i<40;i++){
+  g.start();assert.equal(g.els['division-guide'].hidden,false);
+  const a=g.els['division-have'].children,b=g.els['division-group'].children;
+  assert.equal(a.length,b.length);
+  const n=a.filter(x=>x.className.includes('dark')).length,d=b.filter(x=>x.className.includes('light')).length;
+  assert.ok(Math.abs(n/d-g.problem.ans)<1e-10);
+ }
+ g.els.btnReset.fire('click');assert.equal(g.els['division-guide'].hidden,true);
+ g.els.op.value='add';g.start();assert.equal(g.els['division-guide'].hidden,true);
+});
+
+test('beginner fraction division uses small unit fractions and resets its diagram',()=>{
+ const g=game();g.els.op.value='fraction-easy';
+ for(let i=0;i<40;i++){
+  g.start();const p=g.problem;assert.equal(p.ans,p.a/p.b);assert.equal(g.els['easy-guide'].hidden,false);
+  assert.ok(g.els['easy-bars'].children.length>=1);
+  if(p.a<1){assert.ok(p.b===2||p.b===3);assert.ok(p.answerText.startsWith('1/'));}
+  else {assert.ok(p.a===2||p.a===3);assert.ok(Number.isInteger(p.ans));}
+  g.answer(p.answerText);assert.equal(g.els.progress.textContent,'1 / 10');
+ }
+ g.els.btnReset.fire('click');assert.equal(g.els['easy-guide'].hidden,true);
+});

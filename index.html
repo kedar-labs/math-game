@@ -7,10 +7,10 @@
   <meta name="description" content="A little math. A little mystery. Solve ten problems to reveal a surprise picture.">
   <title>Math Game</title>
   <link rel="stylesheet" href="assets/fonts/fonts.css">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=release-fractions-4">
   <script src="tutor-config.js" defer></script>
-  <script src="math-help.js" defer></script>
-  <script src="game.js" defer></script>
+  <script src="math-help.js?v=release-fractions-4" defer></script>
+  <script src="game.js?v=release-fractions-4" defer></script>
 </head>
 <body>
 <main class="wrap">
@@ -26,7 +26,7 @@
 
   <section class="settings" aria-label="Game settings">
     <span class="settings-title">Make it your game</span>
-    <div class="setting"><label for="op">Topic</label><select id="op"><option value="add">Addition ＋</option><option value="sub">Subtraction −</option><option value="mul">Multiplication ×</option><option value="area">Area and multiplication</option><option value="div">Division ÷</option><option value="fraction-mul">Multiply fractions · area models</option><option value="fraction-div">Divide non-unit fractions</option></select></div>
+    <div class="setting"><label for="op">Topic</label><select id="op"><option value="add">Addition ＋</option><option value="sub">Subtraction −</option><option value="mul">Multiplication ×</option><option value="area">Area and multiplication</option><option value="div">Division ÷</option><option value="fraction-easy">Divide fractions · first steps</option><option value="fraction-mul">Multiply fractions · area models</option><option value="fraction-div">Advanced · divide non-unit fractions</option></select></div>
     <div class="setting"><label for="timerSelect">Time per problem</label><select id="timerSelect"><option value="0">No timer</option><option value="10">10 seconds</option><option value="20" selected>20 seconds</option></select></div>
     <div class="setting-actions"><button id="btnStart" class="primary">Start game <span aria-hidden="true">→</span></button><button id="btnReset" class="secondary">Reset</button></div>
   </section>
@@ -55,7 +55,21 @@
             <p id="model-key" class="model-key"></p>
             <p id="model-task" class="model-task"></p>
           </figure>
-          <p id="answer-hint" class="help-note" hidden>Use a fraction like 3/4, a whole number, or an exact decimal.</p>
+          <figure id="easy-guide" class="division-guide" hidden>
+            <figcaption id="easy-title"></figcaption>
+            <div id="easy-bars"></div>
+            <p id="easy-task" class="model-task"></p>
+          </figure>
+          <figure id="division-guide" class="division-guide" hidden>
+            <figcaption>Compare two amounts of the same whole</figcaption>
+            <p id="division-scale" class="help-note"></p>
+            <p id="division-have-label" class="bar-label"></p>
+            <div id="division-have" class="fraction-bar"></div>
+            <p id="division-group-label" class="bar-label"></p>
+            <div id="division-group" class="fraction-bar"></div>
+            <p class="model-task">How many light-purple groups fit into the dark-purple amount?</p>
+            <p class="help-note">Compare the shaded pieces. Your answer can be less than, equal to, or greater than 1 group.</p>
+          </figure>
           <label class="answer-label" for="ans">Your answer</label>
           <form class="answer" id="answer-form"><input id="ans" type="text" inputmode="text" placeholder="Type here" autocomplete="off" disabled><button id="btnSubmit" class="primary" disabled>Enter <span aria-hidden="true">↵</span></button></form>
           <div class="timer-label"><span>Time remaining</span><span id="time-left">—</span></div>
@@ -73,9 +87,9 @@
       <div class="help-heading"><span class="helper-icon" aria-hidden="true">✦</span><div><h2 id="help-title">Math Help</h2><span class="help-tag">LET’S FIGURE IT OUT</span></div></div>
       <p class="help-intro">Big question? Start with a small step.</p>
       <p id="help-context">Ask a math question anytime—no game needed.</p>
-      <div id="help-reply" role="status" aria-live="polite">Try “Explain this problem” or “What is 8 × 7?”</div>
-      <form id="help-form"><label for="help-input">Your math question</label><textarea id="help-input" rows="3" maxlength="300" placeholder="What is 8 × 7?" required></textarea><button class="help-send" type="submit">Send question <span aria-hidden="true">↗</span></button></form>
       <button id="help-explain" class="help-explain" type="button">Explain this problem</button>
+      <form id="help-form"><label for="help-input">Your math question</label><textarea id="help-input" rows="3" maxlength="300" placeholder="What is 8 × 7?" required></textarea><button class="help-send" type="submit">Send question <span aria-hidden="true">↗</span></button></form>
+      <div id="help-reply" role="status" aria-live="polite">Try “Explain this problem” or “What is 8 × 7?”</div>
       <p class="help-note" id="help-mode">Built-in arithmetic preview, not AI yet.<br>Timed games keep counting while you ask for help.</p>
       <div id="tutor-unlock" hidden><label for="tutor-code">Family access code</label><input id="tutor-code" type="password" autocomplete="off" aria-describedby="tutor-code-note tutor-code-error" aria-invalid="false" placeholder="Ask a parent for the code"><p id="tutor-code-error" class="code-error" role="alert" hidden></p><p id="tutor-code-note" class="help-note">Use your family code here, never an API key.</p></div>
     </aside>

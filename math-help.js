@@ -18,8 +18,9 @@
     if (sym === '−') return `${a} − ${b} = ${a - b}.\nStart at ${a} and move back ${b} on a number line.${b > a ? ' You pass zero, so the answer is negative.' : ''}`;
     if (sym === '×') return `${a} × ${b} = ${a * b}.\nThink of ${a} equal groups with ${b} in each group.${a === 0 || b === 0 ? ' Zero groups or zero in each group gives zero.' : ` Add ${b} a total of ${a} times.`}`;
     if (b === 0) return 'You cannot divide by zero. Equal groups of zero cannot make a nonzero total, and 0 ÷ 0 has no single answer.';
-    const whole = Math.floor(a / b), remainder = a % b;
-    return remainder ? `${a} ÷ ${b} = ${whole} remainder ${remainder}.\n${b} × ${whole} = ${b * whole}, with ${remainder} left over.` : `${a} ÷ ${b} = ${whole}.\nAsk: ${b} times what equals ${a}?\n${b} × ${whole} = ${a}, so the answer is ${whole}.`;
+    const gcd=(x,y)=>y?gcd(y,x%y):x;
+    const divisor=gcd(a,b), result=b/divisor===1?String(a/divisor):`${a/divisor}/${b/divisor}`;
+    return `${a} ÷ ${b} = ${result}.\nDividing by ${b} can be written as the fraction ${a}/${b}.` + (divisor>1?` Divide the top and bottom by ${divisor} to simplify it to ${result}.`:'');
   }
   function answer(text, problem) {
     if (typeof text !== 'string' || text.length > 300) return refusal;
@@ -59,7 +60,7 @@
   function cancelPending() {revision++;controller?.abort();controller=null;sendButton.disabled=false;explainButton.disabled=false;}
   async function ask() {
     if (!input.value.trim()) return;
-    if (!endpoint || problem?.explanation) {reply.textContent=answer(input.value,problem);return;}
+    if (!endpoint) {reply.textContent=answer(input.value,problem);mode.textContent='Built-in math explanation · no API call used.';return;}
     const code=codeInput.value;
     if (!code) {setCodeError('Enter your family access code below.');codeInput.focus();return;}
     cancelPending();

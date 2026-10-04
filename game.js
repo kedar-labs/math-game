@@ -98,8 +98,35 @@
     const g=gcd(n,d); return d/g===1 ? String(n/g) : `${n/g}/${d/g}`;
   }
   function enrichProblem(topic) {
-    const model=$('area-model'); model.replaceChildren(); model.hidden=true; $('model-guide').hidden=true;
-    $('answer-hint').hidden=!topic.startsWith('fraction');
+    const model=$('area-model'); model.replaceChildren(); model.hidden=true; $('model-guide').hidden=true; $('division-guide').hidden=true; $('easy-guide').hidden=true;
+
+    if(topic==='fraction-easy') {
+      const denominator=randomInt(2,4), amount=randomInt(2,3), sharing=randomInt(0,1)===0;
+      const p=sharing
+        ? {a:1/denominator,b:amount,sym:'÷',ans:1/(denominator*amount),answerText:`1/${denominator*amount}`,expression:`1/${denominator} ÷ ${amount}`,
+           explanation:`Share 1/${denominator} equally between ${amount} people.\n\nSplit that shaded piece into ${amount} smaller pieces. Each person gets one.\n\nThe whole now has ${denominator*amount} equal pieces, so each person gets 1/${denominator*amount}.`}
+        : {a:amount,b:1/denominator,sym:'÷',ans:amount*denominator,answerText:String(amount*denominator),expression:`${amount} ÷ 1/${denominator}`,
+           explanation:`How many pieces of size 1/${denominator} fit into ${amount} wholes?\n\nEach whole has ${denominator} pieces. Count the pieces in all ${amount} bars.\n\n${amount} × ${denominator} = ${amount*denominator} pieces.`};
+      state.problem=p;
+      $('easy-guide').hidden=false;
+      $('easy-title').textContent=sharing?`Share 1/${denominator} equally between ${amount} people`:`Cut ${amount} wholes into pieces of size 1/${denominator}`;
+      $('easy-task').textContent=sharing?'Dark purple is one person’s share. What fraction of the whole is it?':'Each bar is one whole. Count all the purple pieces.';
+      const bars=$('easy-bars');bars.replaceChildren();
+      for(let r=0;r<(sharing?1:amount);r++){
+        const bar=document.createElement('div');bar.className='fraction-bar';
+        const parts=sharing?denominator*amount:denominator;
+        bar.style.gridTemplateColumns=`repeat(${parts},minmax(0,1fr))`;
+        bar.setAttribute('role','img');bar.setAttribute('aria-label',sharing?`One whole with ${parts} equal parts. ${amount} parts are shaded; one dark part is one person's share.`:`One whole split into ${parts} purple pieces.`);
+        for(let group=0;group<denominator;group++){
+          const outline=document.createElement('div');outline.className='fraction-section';outline.style.gridTemplateColumns=`repeat(${sharing?amount:1},minmax(0,1fr))`;
+          for(let piece=0;piece<(sharing?amount:1);piece++){const cell=document.createElement('span');cell.className=`bar-piece ${sharing?(group===0?(piece===0?'dark':'light'):''):'dark'}`;outline.appendChild(cell);}
+          bar.appendChild(outline);
+        }
+        bar.style.gridTemplateColumns=`repeat(${denominator},minmax(0,1fr))`;
+        bars.appendChild(bar);
+      }
+      return;
+    }
     if (!['fraction-mul','fraction-div','area'].includes(topic)) return;
     const d=randomInt(3,6), e=randomInt(3,6), n=randomInt(2,d-1), m=randomInt(2,e-1);
     let p;
@@ -111,6 +138,20 @@
       const numerator=divide?n*e:n*m, denominator=divide?d*m:d*e;
       p={a:n/d,b:m/e,sym:divide?'÷':'×',ans:numerator/denominator,answerText:fraction(numerator,denominator),expression:`${n}/${d} ${divide?'÷':'×'} ${m}/${e}`};
       p.explanation=divide?`Dividing by ${m}/${e} asks how many groups of that size fit. Multiply by its reciprocal: ${n}/${d} × ${e}/${m} = ${p.answerText}. Check by multiplying your answer by ${m}/${e}.`:`Shade ${n} of ${d} columns and ${m} of ${e} rows. The overlap covers ${n*m} of the ${d*e} equal parts: ${n}/${d} × ${m}/${e} = ${p.answerText}.`;
+      if(divide) {
+        const gcd=(a,b)=>b?gcd(b,a%b):a;
+        const total=d*e/gcd(d,e), have=n*total/d, group=m*total/e;
+        $('division-guide').hidden=false;
+        $('division-scale').textContent=`Each full bar represents 1, split into ${total} equal pieces.`;
+        $('division-have-label').textContent=`Amount we have: ${n}/${d} = ${have}/${total}`;
+        $('division-group-label').textContent=`One group: ${m}/${e} = ${group}/${total}`;
+        for(const [id,count,tone] of [['division-have',have,'dark'],['division-group',group,'light']]) {
+          const bar=$(id);bar.replaceChildren();bar.style.gridTemplateColumns=`repeat(${total},minmax(0,1fr))`;
+          bar.setAttribute('role','img');bar.setAttribute('aria-label',`${count} of ${total} equal pieces shaded ${tone} purple`);
+          for(let i=0;i<total;i++){const cell=document.createElement('span');cell.className=`bar-piece ${i<count?tone:''}`;bar.appendChild(cell);}
+        }
+        p.explanation=`Let’s solve ${n}/${d} ÷ ${m}/${e}, one step at a time.\n\n1. Keep ${n}/${d}.\n2. Change ÷ to ×.\n3. Flip ONLY the second fraction: ${m}/${e} becomes ${e}/${m}.\n\nNow multiply the top numbers and the bottom numbers:\n${n}/${d} × ${e}/${m} = (${n} × ${e}) / (${d} × ${m}) = ${n*e}/${d*m}.\n\n${fraction(n*e,d*m)===`${n*e}/${d*m}`?`Answer: ${p.answerText}.`:`Simplify ${n*e}/${d*m} to get ${p.answerText}.`}`;
+      }
       if(!divide)Object.assign(p,{rows:e,cols:d,shadeRows:m,shadeCols:n});
     }
     state.problem=p;
@@ -170,7 +211,7 @@
     $('ans').value=''; $('q').textContent='Ready to reveal?';
     $('round-label').textContent='READY WHEN YOU ARE';
     $('feedback').textContent='Choose your settings, then press Start game.'; $('feedback').className='feedback';
-    $('area-model').hidden=true; $('model-guide').hidden=true; $('answer-hint').hidden=true;
+    $('area-model').hidden=true; $('model-guide').hidden=true; $('division-guide').hidden=true; $('easy-guide').hidden=true;
     $('results').hidden=true; $('nameArea').hidden=true; $('name').textContent='';
     $('history').replaceChildren(); $('history-empty').hidden=false; $('history-count').textContent='A fresh start';
     $('board-note').textContent='Every correct answer reveals a tile.';
