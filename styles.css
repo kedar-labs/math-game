@@ -90,3 +90,5 @@ footer{text-align:center;margin:28px 0 8px;font-size:11px;letter-spacing:.7px;co
 
 /* Show each uploaded reward photo in full, including tall toys. */
 #img{object-fit:contain;background:#fff}
+
+.tour-read{min-height:44px;font-size:13px;padding:8px 14px;margin:0 0 14px}
