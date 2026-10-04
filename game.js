@@ -2,13 +2,51 @@
 (function () {
   'use strict';
   const rewardImages = [
-    {"src": "assets/rewards/dumpling.png", "name": "Sunny Dumpling"},
-    {"src": "assets/rewards/strawberry.png", "name": "Berry Sweet"},
-    {"src": "assets/rewards/cheese-cube.png", "name": "Cheddar Charm"},
-    {"src": "assets/rewards/cat-paw.png", "name": "Peachy Paw"},
-    {"src": "assets/rewards/butterfly.png", "name": "Luna Butterfly"},
-    {"src": "assets/rewards/glitter-cube.png", "name": "Cosmic Cube"}
-  ];
+  {
+    "src": "assets/rewards/photos/butter.png",
+    "name": "Butter Buddy"
+  },
+  {
+    "src": "assets/rewards/photos/pink-cat-burger.webp",
+    "name": "Pink Cat Burger"
+  },
+  {
+    "src": "assets/rewards/photos/chick-trio.webp",
+    "name": "Cozy Chick Trio"
+  },
+  {
+    "src": "assets/rewards/photos/bear-sundae.webp",
+    "name": "Bear Sundae"
+  },
+  {
+    "src": "assets/rewards/photos/rainbow-llama.jpg",
+    "name": "Rainbow Llama"
+  },
+  {
+    "src": "assets/rewards/photos/gorilla.webp",
+    "name": "Stretchy Gorilla"
+  },
+  {
+    "src": "assets/rewards/photos/cat-burger.webp",
+    "name": "Cheddar Cat Burger"
+  },
+  {
+    "src": "assets/rewards/photos/carrot.jpeg",
+    "name": "Crunchy Carrot"
+  },
+  {
+    "src": "assets/rewards/photos/toast.webp",
+    "name": "Happy Toast"
+  },
+  {
+    "src": "assets/rewards/photos/penguin.jpg",
+    "name": "Penguin Pals"
+  },
+  {
+    "src": "assets/rewards/photos/rainbow-dumpling.webp",
+    "name": "Rainbow Dumpling"
+  }
+];
 
   const celebrationSounds = [
     "https://storage.googleapis.com/labubu-math-game-sounds/snd_cheer-98223.mp3",

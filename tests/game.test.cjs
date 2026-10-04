@@ -35,9 +35,9 @@ test('all operation generators preserve original arithmetic ranges',()=>{
 });
 test('blank and invalid answers do not reveal or add history',()=>{const g=game();g.start();g.answer('');g.answer('oops');assert.equal(g.els.history.children.length,0);assert.equal(g.els.progress.textContent,'0 / 10');});
 test('original celebration sounds remain unchanged',()=>{const original=JSON.parse(fs.readFileSync('tests/celebration-sounds.json','utf8'));const current=fs.readFileSync('game.js','utf8');assert.deepEqual(current.match(/https:\/\/storage\.googleapis\.com\/[^"\s]+/g),original);});
-test('all six squishy rewards load local assets and reveal their matching names',()=>{
- const rewards=[["dumpling", "Sunny Dumpling"], ["strawberry", "Berry Sweet"], ["cheese-cube", "Cheddar Charm"], ["cat-paw", "Peachy Paw"], ["butterfly", "Luna Butterfly"], ["glitter-cube", "Cosmic Cube"]];
- rewards.forEach(([slug,name],index)=>{const g=game(index);g.start();assert.equal(g.els.img.src,`assets/rewards/${slug}.png`);assert.ok(fs.statSync(g.els.img.src).size>1000);for(let i=0;i<10;i++)g.answer(g.problem.ans);assert.equal(g.els.name.textContent,name);assert.equal(g.els.img.alt,name);});
+test('all uploaded squishy rewards load local assets and reveal their matching names',()=>{
+ const rewards=[{"src": "assets/rewards/photos/butter.png", "name": "Butter Buddy"}, {"src": "assets/rewards/photos/pink-cat-burger.webp", "name": "Pink Cat Burger"}, {"src": "assets/rewards/photos/chick-trio.webp", "name": "Cozy Chick Trio"}, {"src": "assets/rewards/photos/bear-sundae.webp", "name": "Bear Sundae"}, {"src": "assets/rewards/photos/rainbow-llama.jpg", "name": "Rainbow Llama"}, {"src": "assets/rewards/photos/gorilla.webp", "name": "Stretchy Gorilla"}, {"src": "assets/rewards/photos/cat-burger.webp", "name": "Cheddar Cat Burger"}, {"src": "assets/rewards/photos/carrot.jpeg", "name": "Crunchy Carrot"}, {"src": "assets/rewards/photos/toast.webp", "name": "Happy Toast"}, {"src": "assets/rewards/photos/penguin.jpg", "name": "Penguin Pals"}, {"src": "assets/rewards/photos/rainbow-dumpling.webp", "name": "Rainbow Dumpling"}];
+ rewards.forEach(({src,name},index)=>{const g=game(index);g.start();assert.equal(g.els.img.src,src);assert.ok(fs.statSync(src).size>1000);for(let i=0;i<10;i++)g.answer(g.problem.ans);assert.equal(g.els.name.textContent,name);assert.equal(g.els.img.alt,name);});
 });
 test('fraction and area topics accept exact equivalents and show models',()=>{
  for(const topic of ['fraction-mul','fraction-div','area']){

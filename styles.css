@@ -87,3 +87,6 @@ footer{text-align:center;margin:28px 0 8px;font-size:11px;letter-spacing:.7px;co
   .history-heading{flex-wrap:wrap}
 }
 @media(max-height:500px){.tour-balloon{max-height:calc(100dvh - 36px);overflow-y:auto}}
+
+/* Show each uploaded reward photo in full, including tall toys. */
+#img{object-fit:contain;background:#fff}
