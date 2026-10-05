@@ -97,3 +97,7 @@ footer{text-align:center;margin:28px 0 8px;font-size:11px;letter-spacing:.7px;co
 .voice-form{display:grid;gap:10px;margin-top:20px}.voice-form input,.voice-form select,.voice-form textarea{width:100%;min-width:0;font-size:16px;padding:12px;border:2px solid #dfd5eb;border-radius:12px;background:#fff}.voice-form input[aria-invalid="true"]{border-color:#b42338;color:#b42338}.voice-form textarea{resize:vertical}.voice-form label{font-weight:800}
 
 .chances{text-align:center;margin-top:14px}.chance-squishies{display:flex;justify-content:center;align-items:center;gap:8px;height:50px}.chance-squishies img{width:48px;height:48px;object-fit:contain}.chances p{margin:4px 0 0;font-size:13px;font-weight:800;color:var(--purple)}
+
+/* Home links preserve the title and basket layout. */
+.home-link{color:inherit;text-decoration:none;display:inline-block;border-radius:12px}
+.basket-home{line-height:0}
