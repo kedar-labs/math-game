@@ -10,33 +10,23 @@
     ['.history-section','Every try helps you learn','Your answer trail shows what you tried and the correct answers. Reset gives you a fresh start. Start game after a win also clears the old round. Ready? Close this guide and choose your topic!']
   ];
   let index=0,target=null,previousFocus=null;
-  const speech=window.speechSynthesis;
-  let utterance=null;
+  let recording=null;
   function stopReading(){
-    if(utterance){utterance.onend=null;utterance.onerror=null;speech.cancel();utterance=null;}
+    if(recording){recording.onended=null;recording.onerror=null;recording.pause();recording.currentTime=0;recording=null;}
     $('tour-read').textContent='▶';$('tour-read').setAttribute('aria-label','Read aloud');$('tour-read').title='Read aloud';$('tour-read').setAttribute('aria-pressed','false');
   }
-  if(!speech||!window.SpeechSynthesisUtterance){
-    $('tour-read').hidden=true;$('tour-voice-note').hidden=false;
-    $('tour-voice-note').textContent='Read aloud isn’t available in this browser.';
-  }
-  $('tour-read').addEventListener('click',()=>{
-    if(utterance){stopReading();return;}
-    const text=steps[index][1]+'. '+steps[index][2]+(index===1?' Practice only: two plus three equals what?':'');
-    const reading=new window.SpeechSynthesisUtterance(text);
-    const voices=speech.getVoices().filter(voice=>/^en(?:-|_)/i.test(voice.lang));
-    const preferred=['Aria','Jenny','Google US English','Samantha','Karen','Moira','Tessa','Ava','Zira'];
-    reading.voice=preferred.map(name=>voices.find(voice=>voice.name.includes(name))).find(Boolean)||voices.find(voice=>/natural|enhanced|premium/i.test(voice.name))||voices.find(voice=>voice.default)||voices[0]||null;
-    reading.lang=reading.voice?.lang||'en-US';reading.pitch=1;reading.rate=1;
-    reading.onend=()=>{if(utterance===reading)stopReading();};
-    reading.onerror=()=>{if(utterance===reading){stopReading();$('tour-voice-note').hidden=false;$('tour-voice-note').textContent='Couldn’t play the voice. Try Read aloud again.';}};
-    $('tour-voice-note').hidden=true;utterance=reading;
+  $('tour-read').addEventListener('click',async()=>{
+    if(recording){stopReading();return;}
+    const clip=new Audio(`assets/audio/demo/step${index+1}.m4a`);
+    recording=clip;$('tour-voice-note').hidden=true;
     $('tour-read').textContent='■';$('tour-read').setAttribute('aria-label','Stop reading');$('tour-read').title='Stop reading';$('tour-read').setAttribute('aria-pressed','true');
-    speech.speak(reading);
+    const failed=()=>{if(recording!==clip)return;stopReading();$('tour-voice-note').hidden=false;$('tour-voice-note').textContent='Couldn’t play the recording. Try Read aloud again.';};
+    clip.onended=()=>{if(recording===clip)stopReading();};clip.onerror=failed;
+    try{await clip.play();}catch{failed();}
   });
   window.addEventListener('pagehide',stopReading);
   function show(){
-    stopReading();
+    stopReading();$('tour-voice-note').hidden=true;
     target?.classList.remove('tour-highlight');
     const [selector,title,copy]=steps[index];target=document.querySelector(selector);
     target.classList.add('tour-highlight');target.scrollIntoView({block:'center',behavior:'auto'});
