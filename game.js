@@ -54,7 +54,7 @@
   ];
 
   const $ = id => document.getElementById(id);
-  const state = {running:false, timer:null, deadline:0, seconds:20, tiles:[], remaining:[], correct:0, attempts:0, chances:3, problem:null, imageName:'', audio:null};
+  const state = {running:false, timer:null, deadline:0, seconds:20, tiles:[], remaining:[], correct:0, attempts:0, chances:3, problem:null, imageName:'', audio:null, victoryAnimation:null};
   const randomInt = (min,max) => Math.floor(Math.random()*(max-min+1))+min;
   function randomIndex(length) {
     if (window.crypto?.getRandomValues) return window.crypto.getRandomValues(new Uint32Array(1))[0] % length;
@@ -244,13 +244,30 @@
     $('img').alt=state.imageName || 'Revealed picture';
     $('results').hidden=false; $('nameArea').hidden=false;
     $('board-note').textContent='You did it! All ten tiles revealed.';
-    state.audio = new Audio(celebrationSounds[randomIndex(celebrationSounds.length)]);
-    state.audio.volume=.55;
-    state.audio.play().catch(() => {});
+    const clip = celebrationSounds[randomIndex(celebrationSounds.length)];
+    const audio = state.audio = new Audio(clip);
+    audio.volume=.55;
+    // Begin with actual audio playback, using the note timings of each fanfare.
+    audio.onplaying = () => {
+      if (state.audio !== audio || state.victoryAnimation || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+      const beats = clip.includes('victory') ? [0,.32,.64,.98] : [0,.24,.48,.74,1.12,1.5];
+      const duration = 3;
+      const frames = [{transform:'translateY(0) scale(1)',offset:0}];
+      for (const beat of beats) {
+        if (beat > 0) frames.push({transform:'translateY(0) scale(1)',offset:beat/duration});
+        frames.push({transform:'translateY(-10px) scale(.97)',offset:(beat+.09)/duration});
+        frames.push({transform:'translateY(0) scale(1)',offset:(beat+.21)/duration});
+      }
+      frames.push({transform:'translateY(0) scale(1)',offset:1});
+      state.victoryAnimation = $('img').animate(frames,{duration:duration*1000,easing:'ease-in-out'});
+    };
+    audio.onended = () => { state.victoryAnimation?.cancel(); state.victoryAnimation=null; };
+    audio.play().catch(() => {});
   }
   function reset() {
     stopTimer();
-    if (state.audio) {state.audio.pause(); state.audio=null;}
+    if (state.audio) {state.audio.onplaying=null; state.audio.onended=null; state.audio.pause(); state.audio=null;}
+    state.victoryAnimation?.cancel(); state.victoryAnimation=null;
     Object.assign(state,{running:false,correct:0,attempts:0,chances:3,problem:null});
     $('btnStart').disabled=false; $('ans').disabled=true; $('btnSubmit').disabled=true;
     $('ans').value=''; $('q').textContent='Ready to reveal?';

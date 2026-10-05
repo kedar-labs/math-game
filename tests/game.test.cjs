@@ -9,13 +9,14 @@ class Element {
  remove(){if(this.parent)this.parent.children=this.parent.children.filter(e=>e!==this);}
  replaceChildren(){this.children=[];}
  addEventListener(n,fn){this.listeners[n]=fn;}
+ animate(frames,options){this.animation={frames,options,cancelled:false,cancel(){this.cancelled=true;}};return this.animation;}
  focus(){}
  fire(n){this.listeners[n]?.({preventDefault(){}});}
 }
 function game(rewardIndex=0){
  const els={};for(const [,id]of fs.readFileSync('index.html','utf8').matchAll(/id="([^"]+)"/g))els[id]=new Element();
  els.op.value='add';els.timerSelect.value='20';let now=0,serial=0,plays=0;const timers=new Map();let problem=null;
- const context={document:{getElementById:id=>{assert.ok(els[id],id);return els[id];},createElement:()=>new Element()},window:{crypto:{getRandomValues(a){a[0]=rewardIndex;return a;}},MathHelp:{reset(){problem=null;},setProblem(p){problem={...p};}}},Date:{now:()=>now},Math,Uint32Array,Audio:class{play(){plays++;return Promise.resolve();}pause(){}},setInterval:fn=>{timers.set(++serial,fn);return serial;},clearInterval:id=>timers.delete(id)};
+ const context={document:{getElementById:id=>{assert.ok(els[id],id);return els[id];},createElement:()=>new Element()},window:{crypto:{getRandomValues(a){a[0]=rewardIndex;return a;}},MathHelp:{reset(){problem=null;},setProblem(p){problem={...p};}}},Date:{now:()=>now},Math,Uint32Array,Audio:class{play(){plays++;this.onplaying?.();return Promise.resolve();}pause(){}},setInterval:fn=>{timers.set(++serial,fn);return serial;},clearInterval:id=>timers.delete(id)};
  vm.runInNewContext(fs.readFileSync('game.js','utf8'),context);
  return {els,timers,get problem(){return problem;},get plays(){return plays;},start(){els.btnStart.fire('click');},answer(value){els.ans.value=String(value);els['answer-form'].fire('submit');},advance(ms){now+=ms;for(const fn of [...timers.values()])fn();}};
 }
@@ -89,3 +90,5 @@ test('beginner fraction division uses small unit fractions and resets its diagra
  }
  g.els.btnReset.fire('click');assert.equal(g.els['easy-guide'].hidden,true);
 });
+
+test('victory bounce follows audio notes and resets cleanly',()=>{for(const index of [0,1]){const g=game(index);g.start();for(let i=0;i<9;i++)g.answer(g.problem.ans);assert.equal(g.els.img.animation,undefined);g.answer(g.problem.ans);const animation=g.els.img.animation;assert.equal(animation.options.duration,3000);assert.equal(animation.frames.length,index===0?13:19);assert.equal(animation.frames.at(-1).transform,'translateY(0) scale(1)');g.start();assert.equal(animation.cancelled,true);}});
