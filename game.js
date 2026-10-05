@@ -56,7 +56,7 @@
   ];
 
   const $ = id => document.getElementById(id);
-  const state = {running:false, timer:null, deadline:0, seconds:20, tiles:[], remaining:[], correct:0, attempts:0, problem:null, imageName:'', audio:null};
+  const state = {running:false, timer:null, deadline:0, seconds:20, tiles:[], remaining:[], correct:0, attempts:0, chances:3, problem:null, imageName:'', audio:null};
   const randomInt = (min,max) => Math.floor(Math.random()*(max-min+1))+min;
   function randomIndex(length) {
     if (window.crypto?.getRandomValues) return window.crypto.getRandomValues(new Uint32Array(1))[0] % length;
@@ -120,15 +120,24 @@
     $('history-empty').hidden = true;
     $('history-count').textContent = `${state.correct} correct · ${state.attempts} ${state.attempts===1?'try':'tries'}`;
   }
+  function updateChances(){
+    for(let i=1;i<=3;i++)$('chance-'+i).hidden=i>state.chances;
+    $('chances-left').textContent=`${state.chances} ${state.chances===1?'try':'tries'} left`;
+  }
+  function loseChance(message){
+    state.chances--;updateChances();
+    if(state.chances===0){
+      reset();
+      $('feedback').textContent=message+' Three chances used. Press Start game for a fresh round.';
+      $('feedback').className='feedback bad';
+    }else{
+      $('feedback').textContent=message+` ${state.chances} ${state.chances===1?'try':'tries'} left. Try this new one.`;
+      $('feedback').className='feedback bad';nextQuestion();$('ans').value='';$('ans').focus();
+    }
+  }
   function timeout() {
-    stopTimer(); state.running=false; setTime(0);
-    $('q').textContent = 'Time’s up!';
-    $('round-label').textContent = 'A FRESH START AWAITS';
-    $('feedback').textContent = 'Press Reset, then try again. You’ve got this.';
-    $('feedback').className = 'feedback';
-    $('ans').disabled = true; $('btnSubmit').disabled = true;
-    $('results').hidden = false; $('nameArea').hidden = true;
-    history(false,null,true);
+    stopTimer();history(false,null,true);
+    loseChance('Time’s up!');
   }
 
   function fraction(n,d) {
@@ -244,7 +253,7 @@
   function reset() {
     stopTimer();
     if (state.audio) {state.audio.pause(); state.audio=null;}
-    Object.assign(state,{running:false,correct:0,attempts:0,problem:null});
+    Object.assign(state,{running:false,correct:0,attempts:0,chances:3,problem:null});
     $('btnStart').disabled=false; $('ans').disabled=true; $('btnSubmit').disabled=true;
     $('ans').value=''; $('q').textContent='Ready to reveal?';
     $('round-label').textContent='READY WHEN YOU ARE';
@@ -255,7 +264,7 @@
     $('board-note').textContent='Every correct answer reveals a tile.';
     state.seconds=Number($('timerSelect').value); setTime(0); $('time-left').textContent='—'; updateTimerDisplay();
     window.MathHelp.reset();
-    pickPicture(); coverPicture();
+    pickPicture(); coverPicture();updateChances();
   }
   function start() {
     reset(); state.running=true;
@@ -281,8 +290,7 @@
       $('feedback').textContent='Nice work! One more piece of the mystery.'; $('feedback').className='feedback good';
       if(state.correct===10) celebrate(); else nextQuestion();
     } else {
-      $('feedback').textContent=`Previous question: ${state.problem.expression || `${state.problem.a} ${state.problem.sym} ${state.problem.b}`} = ${state.problem.answerText || state.problem.ans}. Try this new one.`; $('feedback').className='feedback bad';
-      nextQuestion();
+      loseChance(`Previous question: ${state.problem.expression || `${state.problem.a} ${state.problem.sym} ${state.problem.b}`} = ${state.problem.answerText || state.problem.ans}.`);
     }
     $('ans').value=''; if(state.running) $('ans').focus();
   }

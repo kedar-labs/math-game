@@ -27,8 +27,11 @@ test('ten correct answers reveal picture and results; Start fully clears old rou
 test('wrong answer stays covered, records correction, starts next question',()=>{
  const g=game();g.start();g.answer(g.problem.ans+1);assert.equal(g.els.progress.textContent,'0 / 10');assert.match(g.els.history.children[0].className,/bad/);assert.match(g.els.history.children[0].children[1].textContent,/Correct answer/);assert.equal(g.timers.size,1);
 });
-test('10 and 20 second timeout stops input; reset clears and restores Start',()=>{
- for(const seconds of [10,20]){const g=game();g.els.timerSelect.value=String(seconds);g.start();g.advance(seconds*1000-1);assert.equal(g.els.ans.disabled,false);g.advance(1);assert.equal(g.els.ans.disabled,true);assert.equal(g.els.btnStart.disabled,true);assert.equal(g.els.nameArea.hidden,true);assert.equal(g.els.results.hidden,false);assert.equal(g.els.history.children.length,1);g.els.btnReset.fire('click');assert.equal(g.els.btnStart.disabled,false);assert.equal(g.els.history.children.length,0);assert.equal(g.timers.size,0);}
+test('10 and 20 second timeouts spend three chances before resetting',()=>{
+ for(const seconds of [10,20]){const g=game();g.els.timerSelect.value=String(seconds);g.start();for(let i=1;i<=2;i++){g.advance(seconds*1000);assert.equal(g.els.ans.disabled,false);assert.equal(g.els['chances-left'].textContent,`${3-i} ${i===2?'try':'tries'} left`);assert.equal(g.els.history.children.length,i);}g.advance(seconds*1000);assert.equal(g.els.ans.disabled,true);assert.equal(g.els.btnStart.disabled,false);assert.equal(g.timers.size,0);assert.equal(g.els.history.children.length,0);assert.match(g.els.feedback.textContent,/Three chances used/);}
+});
+test('wrong answers spend chances, correct answers keep them, third miss resets reveal',()=>{
+ const g=game();g.start();g.answer(g.problem.ans);g.answer(g.problem.ans+1);assert.equal(g.els.progress.textContent,'1 / 10');assert.equal(g.els['chance-3'].hidden,true);assert.equal(g.els['chances-left'].textContent,'2 tries left');g.answer(g.problem.ans);assert.equal(g.els['chances-left'].textContent,'2 tries left');g.answer(g.problem.ans+1);assert.equal(g.els['chance-2'].hidden,true);g.answer(g.problem.ans+1);assert.equal(g.els.progress.textContent,'0 / 10');assert.equal(g.els.ans.disabled,true);assert.equal(g.els['chance-3'].hidden,false);assert.equal(g.els['chances-left'].textContent,'3 tries left');
 });
 test('all operation generators preserve original arithmetic ranges',()=>{
  for(const op of ['add','sub','mul','div']){const g=game();g.els.op.value=op;for(let i=0;i<30;i++){g.start();const{a,b,ans}=g.problem;assert.ok(Number.isInteger(ans));if(op==='add')assert.equal(ans,a+b);if(op==='sub'){assert.ok(a>=b);assert.equal(ans,a-b);}if(op==='mul')assert.equal(ans,a*b);if(op==='div'){assert.ok(b>0);assert.equal(ans,a/b);}}}
@@ -59,7 +62,7 @@ test('untimed games have no countdown or timeout and still finish and restart',(
  assert.equal(g.els.progress.textContent,'10 / 10');assert.equal(g.els.results.hidden,false);
  g.start();assert.equal(g.els.history.children.length,0);assert.equal(g.timers.size,0);
  g.els.btnReset.fire('click');g.els.timerSelect.value='10';g.start();
- assert.equal(g.els.timer.hidden,false);assert.equal(g.timers.size,1);g.advance(10000);assert.equal(g.els.ans.disabled,true);
+ assert.equal(g.els.timer.hidden,false);assert.equal(g.timers.size,1);g.advance(10000);assert.equal(g.els.ans.disabled,false);assert.equal(g.els['chances-left'].textContent,'2 tries left');
 });
 
 test('division bars share a whole and their shaded ratio matches the answer',()=>{
