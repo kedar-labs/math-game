@@ -103,7 +103,7 @@
   function updateTimerDisplay() {
     const untimed=state.seconds===0;
     $('timer').hidden=untimed;
-    $('timer-note').textContent=untimed?'Take your time. There’s no countdown.':'Out of time? Press Reset for a fresh start.';
+    $('timer-note').textContent=untimed?'Take your time. There’s no countdown.':'A wrong answer or timeout uses one chance.';
     if(untimed) $('time-left').textContent='Unlimited';
   }
   function stopTimer() { clearInterval(state.timer); state.timer = null; }
