@@ -260,7 +260,7 @@
     $('feedback').textContent='Choose your settings, then press Start game.'; $('feedback').className='feedback';
     $('area-model').hidden=true; $('model-guide').hidden=true; $('division-guide').hidden=true; $('easy-guide').hidden=true;
     $('results').hidden=true; $('nameArea').hidden=true; $('name').textContent='';
-    $('history').replaceChildren(); $('history-empty').hidden=false; $('history-count').textContent='A fresh start';
+    $('history').replaceChildren(); $('history-empty').hidden=false; $('history-count').textContent='';
     $('board-note').textContent='Every correct answer reveals a tile.';
     state.seconds=Number($('timerSelect').value); setTime(0); $('time-left').textContent='—'; updateTimerDisplay();
     window.MathHelp.reset();
