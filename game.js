@@ -49,10 +49,8 @@
 ];
 
   const celebrationSounds = [
-    "https://storage.googleapis.com/labubu-math-game-sounds/snd_cheer-98223.mp3",
-    "https://storage.googleapis.com/labubu-math-game-sounds/teenage-girl-says-yay-185316.mp3",
-    "https://storage.googleapis.com/labubu-math-game-sounds/wow-423653.mp3",
-    "https://storage.googleapis.com/labubu-math-game-sounds/tada-fanfare-a-6313.mp3"
+    "assets/audio/win/victory.wav",
+    "assets/audio/win/fanfare.wav"
   ];
 
   const $ = id => document.getElementById(id);
@@ -247,7 +245,7 @@
     $('results').hidden=false; $('nameArea').hidden=false;
     $('board-note').textContent='You did it! All ten tiles revealed.';
     state.audio = new Audio(celebrationSounds[randomIndex(celebrationSounds.length)]);
-    state.audio.volume=.9;
+    state.audio.volume=.55;
     state.audio.play().catch(() => {});
   }
   function reset() {
